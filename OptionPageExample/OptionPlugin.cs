@@ -23,12 +23,23 @@ namespace Hell
         private MirandaHook optInit;
 
         /// <summary>
+        /// DlgProc delegate.
+        /// </summary>
+        private OptionsDialogPage.DlgProc dlgProc;
+
+        /// <summary>
+        /// Object for handling WPF object hosting in native environment.
+        /// </summary>
+        private HwndSource hwndSource;
+
+        /// <summary>
         /// Object constructor.
         /// </summary>
         public OptionPlugin(IntPtr hInstance)
             : base(hInstance)
         {
             optInit = OptInitialise;
+            dlgProc = DlgProc;
         }
 
         /// <summary>
@@ -70,9 +81,7 @@ namespace Hell
             optionPage.template = new IntPtr(Utils.StubDialogID);
             optionPage.group = "Network";
             optionPage.title = "Example";
-            optionPage.tab = "Account";
-            optionPage.dlgProc = DlgProc;
-            // TODO: need to somehow fill template field.
+            optionPage.dlgProc = dlgProc;
 
             IntPtr pointer =
                 Marshal.AllocHGlobal(Marshal.SizeOf(typeof(OptionsDialogPage)));
@@ -82,8 +91,6 @@ namespace Hell
 
             return 0;
         }
-
-        private HwndSource hwndSource;
         
         /// <summary>
         /// Method processing options page events.
@@ -92,8 +99,6 @@ namespace Hell
         {
             if (message == Utils.WM_INITDIALOG)
             {
-                System.Windows.Forms.MessageBox.Show("OptionPlugin.DlgProc()");
-                
                 var parameters = new HwndSourceParameters("page");
                 parameters.PositionX = 0;
                 parameters.PositionY = 0;
