@@ -78,10 +78,10 @@ namespace Hell
             var optionPage = new OptionsDialogPage();
             optionPage.position = -800000000;
             optionPage.hInstance = hInstance;
-            optionPage.template = new IntPtr(Utils.StubDialogID);
-            optionPage.group = "Network";
-            optionPage.title = "Example";
-            optionPage.dlgProc = dlgProc;
+            optionPage.pszTemplate = new IntPtr(Utils.StubDialogID);
+            optionPage.pszGroup = "Network";
+            optionPage.pszTitle = "Example";
+            optionPage.pfnDlgProc = dlgProc;
 
             IntPtr pointer =
                 Marshal.AllocHGlobal(Marshal.SizeOf(typeof(OptionsDialogPage)));

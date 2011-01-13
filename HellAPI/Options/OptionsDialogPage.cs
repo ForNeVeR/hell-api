@@ -13,15 +13,15 @@ namespace Hell.Options
         public delegate IntPtr DlgProc(IntPtr hDlg, uint message, 
             IntPtr wParam, IntPtr hParam);
         
-        int size = Marshal.SizeOf(typeof(OptionsDialogPage));
+        private int cbSize = Marshal.SizeOf(typeof(OptionsDialogPage));
         public int position;
-        public string title;
+        public string pszTitle;
         [MarshalAs(UnmanagedType.FunctionPtr)]
-        public DlgProc dlgProc;
-        public IntPtr template;
+        public DlgProc pfnDlgProc;
+        public IntPtr pszTemplate;
         public IntPtr hInstance;
         public IntPtr hIcon;
-        public string group;
+        public string pszGroup;
         public int groupPosition;
         public IntPtr hGroupIcon;
         public int flags;

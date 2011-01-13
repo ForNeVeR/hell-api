@@ -64,7 +64,7 @@ void LoadSubplugins()
     String ^path =
         Path::GetDirectoryName(Assembly::GetExecutingAssembly()->Location);
     DirectoryInfo ^directory = gcnew DirectoryInfo(path);
-    for each(FileInfo ^file in directory->GetFiles())
+    for each(FileInfo ^file in directory->GetFiles("*.dll"))
     {
         try
         {
