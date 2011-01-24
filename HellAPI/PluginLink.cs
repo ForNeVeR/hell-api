@@ -36,8 +36,13 @@ namespace Hell
 
         [UnmanagedFunctionPointer(CallingConvention.Cdecl,
             CharSet = CharSet.Ansi)]
-        public delegate IntPtr CallServiceDelegate(string charPtr,
+        public delegate IntPtr CallServiceDelegate(string service,
             IntPtr wParam, IntPtr lParam);
+        
+        [UnmanagedFunctionPointer(CallingConvention.Cdecl,
+            CharSet = CharSet.Ansi)]
+        public delegate IntPtr CallContactServiceDelegate(IntPtr hContact, 
+            string charPtr, IntPtr wParam, IntPtr lParam);
 
         [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
         delegate void UnspecifiedDelegate();
@@ -95,7 +100,7 @@ namespace Hell
         UnspecifiedDelegate CallProtoService;
 
         [MarshalAs(UnmanagedType.FunctionPtr)]
-        UnspecifiedDelegate CallContactService;
+        public CallContactServiceDelegate CallContactService;
 
         [MarshalAs(UnmanagedType.FunctionPtr)]
         UnspecifiedDelegate HookEventParam;

@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Runtime.InteropServices;
 using System.Windows.Interop;
-using Hell.Options;
+using Hell.LastCircle.Options;
 using System.Windows.Controls;
 
 namespace Hell
@@ -12,11 +12,6 @@ namespace Hell
     [MirandaPlugin]
     public class OptionPlugin : Plugin
     {
-        /// <summary>
-        /// Object contains pointers to Miranda service functions.
-        /// </summary>
-        private PluginLink pluginLink;
-
         /// <summary>
         /// Hook for creating options page.
         /// </summary>
@@ -35,8 +30,7 @@ namespace Hell
         /// <summary>
         /// Object constructor.
         /// </summary>
-        public OptionPlugin(IntPtr hInstance)
-            : base(hInstance)
+        public OptionPlugin()
         {
             optInit = OptInitialise;
             dlgProc = DlgProc;
@@ -49,10 +43,8 @@ namespace Hell
         /// Provided PluginLink object contains pointers to Miranda service
         /// functions.
         /// </param>
-        protected override void Load(PluginLink pluginLink)
-        {            
-            this.pluginLink = pluginLink;
-
+        protected override void Load()
+        {
             pluginLink.HookEvent("Opt/Initialise", optInit);
         }
 
@@ -79,7 +71,7 @@ namespace Hell
             optionPage.position = -800000000;
             optionPage.hInstance = hInstance;
             optionPage.pszTemplate = new IntPtr(Utils.StubDialogID);
-            optionPage.pszGroup = "Network";
+            optionPage.pszGroup = "Example";
             optionPage.pszTitle = "Example";
             optionPage.pfnDlgProc = dlgProc;
 
@@ -87,7 +79,7 @@ namespace Hell
                 Marshal.AllocHGlobal(Marshal.SizeOf(typeof(OptionsDialogPage)));
             Marshal.StructureToPtr(optionPage, pointer, false);
             pluginLink.CallService("Opt/AddPage", addInfo, pointer);
-            Marshal.DestroyStructure(pointer, typeof(OptionsDialogPage));
+            Marshal.FreeHGlobal(pointer);
 
             return 0;
         }
@@ -99,11 +91,11 @@ namespace Hell
         {
             if (message == Utils.WM_INITDIALOG)
             {
-                var parameters = new HwndSourceParameters("page");
+                var parameters = new HwndSourceParameters("OptionPageExample");
                 parameters.PositionX = 0;
                 parameters.PositionY = 0;
-                parameters.Height = 390;
-                parameters.Width = 470;
+                parameters.Width = Utils.MirandaOptionsWidth;
+                parameters.Height = Utils.MirandaOptionsHeight;                
                 parameters.ParentWindow = hDlg;
                 parameters.WindowStyle = Utils.WS_VISIBLE | Utils.WS_CHILD;
                 hwndSource = new HwndSource(parameters);

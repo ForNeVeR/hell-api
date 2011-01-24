@@ -60,10 +60,20 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="CList\CListMenuItem.cs" />
-    <Compile Include="Contacts\ContactInfo.cs" />
-    <Compile Include="Options\OptionsDialogPage.cs" />
-    <Compile Include="Options\Utils.cs" />
+    <Compile Include="FirstCircle\Contact.cs" />
+    <Compile Include="FirstCircle\DatabaseConnector.cs" />
+    <Compile Include="LastCircle\CList\CListMenuItem.cs" />
+    <Compile Include="LastCircle\Contacts\ContactInfo.cs" />
+    <Compile Include="LastCircle\Database\DBContactGetSetting.cs" />
+    <Compile Include="LastCircle\Database\DBContactWriteSetting.cs" />
+    <Compile Include="LastCircle\Database\DBEventGetText.cs" />
+    <Compile Include="LastCircle\Database\DBEventInfo.cs" />
+    <Compile Include="LastCircle\Database\DBContactEnumSettings.cs" />
+    <Compile Include="LastCircle\Database\DBVariant.cs" />
+    <Compile Include="LastCircle\Database\Utils.cs" />
+    <Compile Include="LastCircle\Options\OptionsDialogPage.cs" />
+    <Compile Include="LastCircle\Options\Utils.cs" />
+    <Compile Include="LastCircle\System\MMInterface.cs" />
     <Compile Include="Plugin.cs" />
     <Compile Include="MirandaPluginAttribute.cs" />
     <Compile Include="PluginLink.cs" />

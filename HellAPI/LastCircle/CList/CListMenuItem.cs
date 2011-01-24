@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Runtime.InteropServices;
 
-namespace Hell.CList
+namespace Hell.LastCircle.CList
 {
     [StructLayout(LayoutKind.Sequential, CharSet=CharSet.Ansi)]
     public class CListMenuItem

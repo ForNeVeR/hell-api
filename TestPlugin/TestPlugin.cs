@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Runtime.InteropServices;
 using System.Windows.Forms;
-using Hell.CList;
+using Hell.LastCircle.CList;
 
 namespace Hell
 {
@@ -14,11 +14,6 @@ namespace Hell
     public class TestPlugin : Plugin
     {
         /// <summary>
-        /// This object allows us to call Miranda API functions.
-        /// </summary>
-        private PluginLink pluginLink;
-
-        /// <summary>
         /// ALWAYS remember to save delegates to your methods that can be
         /// called from Miranda. If you forget to do that, delegate will be
         /// garbage collected and method call will fail.
@@ -28,8 +23,7 @@ namespace Hell
         /// <summary>
         /// Plugin object constructor.
         /// </summary>
-        public TestPlugin(IntPtr hInstance)
-            : base(hInstance)
+        public TestPlugin()
         {
             menuCommand = PluginMenuCommand;
         }
@@ -41,10 +35,8 @@ namespace Hell
         /// Provided PluginLink object contains pointers to Miranda service
         /// functions.
         /// </param>
-        protected override void Load(PluginLink pluginLink)
+        protected override void Load()
         {
-            this.pluginLink = pluginLink;
-
             pluginLink.CreateServiceFunction("TestPlug/MenuCommand",
                 menuCommand);
 
@@ -61,7 +53,7 @@ namespace Hell
             Marshal.StructureToPtr(mi, pointer, false);
             pluginLink.CallService("CList/AddMainMenuItem", IntPtr.Zero,
                 pointer);
-            Marshal.DestroyStructure(pointer, typeof(CListMenuItem));
+            Marshal.FreeHGlobal(pointer);
         }
 
         /// <summary>

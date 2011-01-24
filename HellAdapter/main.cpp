@@ -6,6 +6,8 @@
 #include <newpluginapi.h>
 #include <m_clist.h>
 
+#include "constants.h"
+
 using namespace System;
 using namespace System::Collections::Generic;
 using namespace System::IO;
@@ -44,7 +46,7 @@ namespace Hell
     ref class PluginCollection
     {
     public:
-        static List<Plugin ^> plugins;
+        static Plugin ^ManagerPlugin;
     };
 }
 
@@ -58,45 +60,59 @@ BOOL WINAPI DllMain(HINSTANCE instance, DWORD, LPVOID)
 
 #pragma managed
 
-/* This function loads all managed plugins into memory. */
-void LoadSubplugins()
+/* This function loads plugin manager assembly and creates manager instance. */
+void GetManager()
 {
+    List<Type ^> ^pluginsForLoading = gcnew List<Type ^>();
+
     String ^path =
         Path::GetDirectoryName(Assembly::GetExecutingAssembly()->Location);
-    DirectoryInfo ^directory = gcnew DirectoryInfo(path);
+    DirectoryInfo ^directory = gcnew DirectoryInfo(path);	
+
+    // First, create a list of all managed plugin types.
     for each(FileInfo ^file in directory->GetFiles("*.dll"))
     {
         try
         {
             Assembly ^assembly = Assembly::LoadFile(file->FullName);
+
+            if (file->Name == MANAGER_PLUGIN_NAME ".dll")
+            {
+                continue;
+            }
+
             array<Type ^> ^types = assembly->GetExportedTypes();
             for each(Type ^type in types)
             {
                 if(type->GetCustomAttributes(MirandaPluginAttribute::typeid,
                     false)->Length != 0)
                 {
-                    IntPtr ^instance = gcnew IntPtr(hInstance);
-                    array<Object ^> ^args = gcnew array<Object ^>(1);
-                    args[0] = instance;
-
-                    PluginCollection::plugins.Add(safe_cast<Plugin ^>(
-                        assembly->CreateInstance(type->FullName, false,
-                        BindingFlags::Default, nullptr, args, nullptr,
-                        nullptr)));
+                    pluginsForLoading->Add(type);
                 }
             }
         }
-        catch (BadImageFormatException ^)
+        catch(BadImageFormatException ^)
         {
             // Do nothing. File is not managed plugin.
         }
     }
+
+    // Create plugin manager instance.
+    Assembly ^managerAssembly = Assembly::LoadFile(path +
+        "\\" MANAGER_PLUGIN_NAME ".dll");
+
+    array<Object ^> ^args = gcnew array<Object ^>(1);
+    args[0] = pluginsForLoading;
+
+    PluginCollection::ManagerPlugin = safe_cast<Plugin ^>(
+        managerAssembly->CreateInstance(MANAGER_TYPE_NAME, false,
+        BindingFlags::Default, nullptr, args, nullptr, nullptr));
 }
 
 /* A function that returns pointer to PLUGININFOEX structure. */
 MIRANDA_EXPORT PLUGININFOEX *MirandaPluginInfoEx(DWORD mirandaVersion)
 {
-    LoadSubplugins();
+    GetManager();
     
     return &pluginInfo;
 }
@@ -110,11 +126,14 @@ MIRANDA_EXPORT const MUUID *MirandaPluginInterfaces()
 /* A function called on plugin load. */
 MIRANDA_EXPORT int Load(PLUGINLINK *pluginLink)
 {
-    // Load all plugins:
-    for each(Plugin ^plugin in PluginCollection::plugins)
-    {
-        plugin->Load(IntPtr(pluginLink));
-    }
+    // Load manager plugin:
+    array<Object ^> ^args = gcnew array<Object ^>(2);
+    args[0] = gcnew IntPtr(hInstance);
+    args[1] = gcnew IntPtr(pluginLink);
+
+    PluginCollection::ManagerPlugin->GetType()->InvokeMember("Load",
+        BindingFlags::InvokeMethod, nullptr, PluginCollection::ManagerPlugin,
+        args);
 
     return 0;
 }
@@ -122,11 +141,8 @@ MIRANDA_EXPORT int Load(PLUGINLINK *pluginLink)
 /* A function called on plugin unload. */
 MIRANDA_EXPORT int Unload()
 {
-    for each(Plugin ^plugin in PluginCollection::plugins)
-    {
-        plugin->Unload();
-    }
-    PluginCollection::plugins.Clear();
+    // Unload manager plugin:
+    PluginCollection::ManagerPlugin->Unload();
 
     return 0;
 }
