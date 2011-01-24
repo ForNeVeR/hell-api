@@ -91,19 +91,18 @@ namespace Hell.FirstCircle
         private object GetSetting(IntPtr hContact, string moduleName,
             string settingName)
         {
-            IntPtr pDBContactGetSetting = Marshal.AllocHGlobal(
-                Marshal.SizeOf(typeof(DBContactGetSetting)));
-            IntPtr pVariant =
-                Marshal.AllocHGlobal(Marshal.SizeOf(typeof(DBVariant)));
-
-            try
+            using (var pDBContactGetSetting = new AutoPtr(Marshal.AllocHGlobal(
+                Marshal.SizeOf(typeof(DBContactGetSetting)))))
+            using (var pVariant = new AutoPtr(
+                Marshal.AllocHGlobal(Marshal.SizeOf(typeof(DBVariant)))))
             { 
                 var getSetting = new DBContactGetSetting();
                 getSetting.szModule = moduleName;
                 getSetting.szSetting = settingName;
                 getSetting.pValue = pVariant;
 
-                Marshal.StructureToPtr(getSetting, pDBContactGetSetting, false);
+                Marshal.StructureToPtr(getSetting, pDBContactGetSetting,
+                    false);
 
                 IntPtr result = pluginLink.CallService("DB/Contact/GetSetting",
                     hContact, pDBContactGetSetting);
@@ -143,14 +142,6 @@ namespace Hell.FirstCircle
                         throw new DatabaseException();
                 }
             }
-            finally
-            {
-                pluginLink.CallService("DB/Contact/FreeVariant", IntPtr.Zero,
-                    pVariant);
-                
-                Marshal.FreeHGlobal(pDBContactGetSetting);
-                Marshal.FreeHGlobal(pVariant);
-            }
         }
 
         /// <summary>
@@ -171,10 +162,9 @@ namespace Hell.FirstCircle
         private void SetSetting(IntPtr hContact, string moduleName,
             string settingName, object value)
         {
-            IntPtr pDBContactWriteSetting = Marshal.AllocHGlobal(
-                Marshal.SizeOf(typeof(DBContactWriteSetting)));
-
-            try
+            using(var pDBContactWriteSetting =
+                new AutoPtr(Marshal.AllocHGlobal(
+                    Marshal.SizeOf(typeof(DBContactWriteSetting)))))
             {
                 var writeSetting = new DBContactWriteSetting();
                 writeSetting.szModule = moduleName;
@@ -182,6 +172,9 @@ namespace Hell.FirstCircle
 
                 var variant = new DBVariant();
 
+                // This pointer will be set if we allocate unmanaged memory to
+                // store the value:
+                AutoPtr valuePtr = null;
                 if (value is byte)
                 {
                     variant.type = DBVariant.DBVT_BYTE;
@@ -210,19 +203,19 @@ namespace Hell.FirstCircle
                 else if (value is string)
                 {
                     variant.type = DBVariant.DBVT_WCHAR;
-                    IntPtr pString =
-                        Marshal.StringToHGlobalUni(value as string);
-                    variant.Value.pszVal = pString;
+                    valuePtr = new AutoPtr(
+                        Marshal.StringToHGlobalUni(value as string));
+                    variant.Value.pszVal = valuePtr;
                 }
                 else if (value is byte[])
                 {
                     var blob = value as byte[];
-                    IntPtr pBlob = Marshal.AllocHGlobal(blob.Length);
+                    valuePtr = new AutoPtr(Marshal.AllocHGlobal(blob.Length));
                     for (int i = 0; i < blob.Length; ++i)
-                        Marshal.WriteByte(pBlob, i, blob[i]);
+                        Marshal.WriteByte(valuePtr, i, blob[i]);
 
                     variant.Value.ByteArrayValue.cpbVal = (ushort)blob.Length;
-                    variant.Value.ByteArrayValue.pbVal = pBlob;
+                    variant.Value.ByteArrayValue.pbVal = valuePtr;
                 }
                 else
                     throw new ArgumentException("Type of argument not " +
@@ -238,17 +231,11 @@ namespace Hell.FirstCircle
                     pDBContactWriteSetting);
 
                 // Free allocated memory:
-                if (value is string)
-                    Marshal.FreeHGlobal(variant.Value.pszVal);
-                else if (value is byte[])
-                    Marshal.FreeHGlobal(variant.Value.ByteArrayValue.pbVal);
+                if (valuePtr != null)
+                    valuePtr.Dispose();
                 
                 if (result != IntPtr.Zero)
                     throw new DatabaseException();
-            }
-            finally
-            {
-                Marshal.FreeHGlobal(pDBContactWriteSetting);
             }
         }
 
@@ -301,24 +288,24 @@ namespace Hell.FirstCircle
             string moduleName)
         {
             var result = new List<string>();
-            
-            IntPtr pDBContactEnumSettings = Marshal.AllocHGlobal(
-                Marshal.SizeOf(typeof(DBContactEnumSettings)));
 
-            var enumSettings = new DBContactEnumSettings();
-            enumSettings.pfnEnumProc = (settingName, _) =>
-                {
-                    result.Add(settingName);
-                    return 0;
-                };
-            enumSettings.szModule = moduleName;
+            using (var pDBContactEnumSettings =
+                new AutoPtr(Marshal.AllocHGlobal(
+                    Marshal.SizeOf(typeof(DBContactEnumSettings)))))
+            {
+                var enumSettings = new DBContactEnumSettings();
+                enumSettings.pfnEnumProc = (settingName, _) =>
+                    {
+                        result.Add(settingName);
+                        return 0;
+                    };
+                enumSettings.szModule = moduleName;
 
-            Marshal.StructureToPtr(enumSettings, pDBContactEnumSettings,
-                false);
-            pluginLink.CallService("DB/Contact/EnumSettings", hContact,
-                pDBContactEnumSettings);
-
-            Marshal.FreeHGlobal(pDBContactEnumSettings);
+                Marshal.StructureToPtr(enumSettings, pDBContactEnumSettings,
+                    false);
+                pluginLink.CallService("DB/Contact/EnumSettings", hContact,
+                    pDBContactEnumSettings);
+            }
 
             return result.ToArray();
         }

@@ -67,19 +67,20 @@ namespace Hell
         {            
             IntPtr addInfo = wParam;
 
-            var optionPage = new OptionsDialogPage();
-            optionPage.position = -800000000;
-            optionPage.hInstance = hInstance;
-            optionPage.pszTemplate = new IntPtr(Utils.StubDialogID);
-            optionPage.pszGroup = "Example";
-            optionPage.pszTitle = "Example";
-            optionPage.pfnDlgProc = dlgProc;
+            using (var pOptionPage = new AutoPtr(Marshal.AllocHGlobal(
+                Marshal.SizeOf(typeof(OptionsDialogPage)))))
+            {
+                var optionPage = new OptionsDialogPage();
+                optionPage.position = -800000000;
+                optionPage.hInstance = hInstance;
+                optionPage.pszTemplate = new IntPtr(Utils.StubDialogID);
+                optionPage.pszGroup = "Example";
+                optionPage.pszTitle = "Example";
+                optionPage.pfnDlgProc = dlgProc;
 
-            IntPtr pointer =
-                Marshal.AllocHGlobal(Marshal.SizeOf(typeof(OptionsDialogPage)));
-            Marshal.StructureToPtr(optionPage, pointer, false);
-            pluginLink.CallService("Opt/AddPage", addInfo, pointer);
-            Marshal.FreeHGlobal(pointer);
+                Marshal.StructureToPtr(optionPage, pOptionPage, false);
+                pluginLink.CallService("Opt/AddPage", addInfo, pOptionPage);
+            }
 
             return 0;
         }

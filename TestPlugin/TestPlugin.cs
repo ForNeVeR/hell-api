@@ -48,12 +48,15 @@ namespace Hell
             mi.name = "&Test Plugin...";
             mi.service = "TestPlug/MenuCommand";
 
-            IntPtr pointer =
-                Marshal.AllocHGlobal(Marshal.SizeOf(typeof(CListMenuItem)));
-            Marshal.StructureToPtr(mi, pointer, false);
-            pluginLink.CallService("CList/AddMainMenuItem", IntPtr.Zero,
-                pointer);
-            Marshal.FreeHGlobal(pointer);
+            // You can use raw IntPtr instead of AutoPtr here, but then do not
+            // forget to call Marshal.FreeHGlobal to prevent memory leaks.
+            using (var pClistMenuItem = new AutoPtr(
+                Marshal.AllocHGlobal(Marshal.SizeOf(typeof(CListMenuItem)))))
+            {
+                Marshal.StructureToPtr(mi, pClistMenuItem, false);
+                pluginLink.CallService("CList/AddMainMenuItem", IntPtr.Zero,
+                    pClistMenuItem);
+            }
         }
 
         /// <summary>

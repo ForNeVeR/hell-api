@@ -60,6 +60,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AutoPtr.cs" />
     <Compile Include="FirstCircle\Contact.cs" />
     <Compile Include="FirstCircle\DatabaseConnector.cs" />
     <Compile Include="LastCircle\CList\CListMenuItem.cs" />

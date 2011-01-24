@@ -37,24 +37,25 @@ namespace Hell.FirstCircle
                 info.hContact = hContact;
                 info.dwFlag = ContactInfo.CNF_NICK;
 
-                // Copy ContactInfo to unmanaged memory:
-                IntPtr pContactInfo =
-                    Marshal.AllocHGlobal(Marshal.SizeOf(typeof(ContactInfo)));
-                Marshal.StructureToPtr(info, pContactInfo, false);
-
-                IntPtr result =
-                    pluginLink.CallService("Miranda/Contact/GetContactInfo",
-                        IntPtr.Zero, pContactInfo);
-
                 string nick = null;
-                if (result == IntPtr.Zero)
+                
+                using (var pContactInfo = new AutoPtr(
+                    Marshal.AllocHGlobal(Marshal.SizeOf(typeof(ContactInfo)))))
                 {
-                    info = (ContactInfo)Marshal.PtrToStructure(pContactInfo,
-                        typeof(ContactInfo));
-                    nick = Marshal.PtrToStringAnsi(info.value.pszVal);
-                }
+                    // Copy ContactInfo to unmanaged memory:
+                    Marshal.StructureToPtr(info, pContactInfo, false);
 
-                Marshal.FreeHGlobal(pContactInfo);
+                    IntPtr result =
+                        pluginLink.CallService("Miranda/Contact/GetContactInfo",
+                            IntPtr.Zero, pContactInfo);
+
+                    if (result == IntPtr.Zero)
+                    {
+                        info = (ContactInfo)Marshal.PtrToStructure(pContactInfo,
+                            typeof(ContactInfo));
+                        nick = Marshal.PtrToStringAnsi(info.value.pszVal);
+                    }
+                }
 
                 return nick;
             }
@@ -72,18 +73,18 @@ namespace Hell.FirstCircle
                 info.hContact = hContact;
 
                 // Copy ContactInfo to unmanaged memory:
-                IntPtr pContactInfo =
-                    Marshal.AllocHGlobal(Marshal.SizeOf(typeof(ContactInfo)));
-                Marshal.StructureToPtr(info, pContactInfo, false);
+                using (var pContactInfo = new AutoPtr(
+                    Marshal.AllocHGlobal(Marshal.SizeOf(typeof(ContactInfo)))))
+                {
+                    Marshal.StructureToPtr(info, pContactInfo, false);
 
-                IntPtr result =
-                    pluginLink.CallService("Miranda/Contact/GetContactInfo",
-                        IntPtr.Zero, pContactInfo);
+                    IntPtr result = pluginLink.CallService(
+                        "Miranda/Contact/GetContactInfo", IntPtr.Zero,
+                        pContactInfo);
 
-                info = (ContactInfo)Marshal.PtrToStructure(pContactInfo,
-                    typeof(ContactInfo));
-                
-                Marshal.FreeHGlobal(pContactInfo);
+                    info = (ContactInfo)Marshal.PtrToStructure(pContactInfo,
+                        typeof(ContactInfo));
+                }
 
                 return info.szProto;
             }
@@ -104,20 +105,20 @@ namespace Hell.FirstCircle
             eventInfo.timestamp = (int)(DateTime.Now.ToUniversalTime() -
                 new DateTime(1970, 1, 1)).TotalSeconds;
             
-            IntPtr pString = Marshal.StringToHGlobalAnsi(message);
-            eventInfo.cbBlob = (uint)message.Length + 1;
-            eventInfo.pBlob = pString;
+            using (var pString =
+                new AutoPtr(Marshal.StringToHGlobalAnsi(message)))
+            using (var pDBEventInfo = new AutoPtr(
+                Marshal.AllocHGlobal(Marshal.SizeOf(typeof(DBEventInfo)))))
+            {
+                eventInfo.cbBlob = (uint)message.Length + 1;
+                eventInfo.pBlob = pString;
 
-            IntPtr pDBEventInfo =
-                Marshal.AllocHGlobal(Marshal.SizeOf(typeof(DBEventInfo)));
-            Marshal.StructureToPtr(eventInfo, pDBEventInfo, false);
+                Marshal.StructureToPtr(eventInfo, pDBEventInfo, false);
 
-            pluginLink.CallService("DB/Event/Add", hContact, pDBEventInfo);
-            pluginLink.CallContactService(hContact, "/SendMsg", IntPtr.Zero,
-                pString);
-            
-            Marshal.FreeHGlobal(pString);
-            Marshal.FreeHGlobal(pDBEventInfo);
+                pluginLink.CallService("DB/Event/Add", hContact, pDBEventInfo);
+                pluginLink.CallContactService(hContact, "/SendMsg", IntPtr.Zero,
+                    pString);
+            }
         }
 
         public static bool operator ==(Contact c1, Contact c2)

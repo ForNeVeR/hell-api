@@ -57,59 +57,60 @@ namespace HellGateMM
             int blobSize = pluginLink.CallService("DB/Event/GetBlobSize",
                 hDBEvent, IntPtr.Zero).ToInt32();
 
-            IntPtr pBlob = Marshal.AllocHGlobal(blobSize);
-
-            var eventInfo = new DBEventInfo();
-            eventInfo.pBlob = pBlob;
-            eventInfo.cbBlob = (uint)blobSize;
-
-            IntPtr pDBEventInfo =
-                Marshal.AllocHGlobal(Marshal.SizeOf(typeof(DBEventInfo)));
-            Marshal.StructureToPtr(eventInfo, pDBEventInfo, false);
-            pluginLink.CallService("DB/Event/Get", hDBEvent, pDBEventInfo);
-
-            eventInfo = (DBEventInfo) Marshal.PtrToStructure(pDBEventInfo,
-                typeof(DBEventInfo));
-            
-
-            if (eventInfo.eventType == DBEventInfo.EVENTTYPE_MESSAGE)
+            using (var pBlob = new AutoPtr(Marshal.AllocHGlobal(blobSize)))
+            using (var pDBEventInfo = new AutoPtr(
+                Marshal.AllocHGlobal(Marshal.SizeOf(typeof(DBEventInfo)))))
             {
-                var getText = new DBEventGetText();
-                getText.dbei = pDBEventInfo;
-                getText.datatype = Utils.DBVT_ASCIIZ;
-                getText.codepage = 1251;
+                var eventInfo = new DBEventInfo();
+                eventInfo.pBlob = pBlob;
+                eventInfo.cbBlob = (uint)blobSize;
 
-                IntPtr pDBEventGetText = 
-                    Marshal.AllocHGlobal(Marshal.SizeOf(
-                        typeof(DBEventGetText)));
-                Marshal.StructureToPtr(getText, pDBEventGetText, false);
+                Marshal.StructureToPtr(eventInfo, pDBEventInfo, false);
+                pluginLink.CallService("DB/Event/Get", hDBEvent, pDBEventInfo);
 
-                IntPtr pString = pluginLink.CallService("DB/Event/GetText",
-                    IntPtr.Zero, pDBEventGetText);
-                string message = Marshal.PtrToStringAnsi(pString);
+                eventInfo = (DBEventInfo)Marshal.PtrToStructure(pDBEventInfo,
+                    typeof(DBEventInfo));
 
-                mmi.mmi_free(pString);
 
-                Marshal.FreeHGlobal(pDBEventGetText);
-
-                var contact = new Contact(hContact, pluginLink);
-
-                DateTime eventTime = new DateTime(1970, 1,
-                    1).AddSeconds(eventInfo.timestamp).ToUniversalTime();
-                if ((eventInfo.flags & DBEventInfo.DBEF_SENT) != 0)
+                if (eventInfo.eventType == DBEventInfo.EVENTTYPE_MESSAGE)
                 {
-                    if (MessageSentEvent != null)
-                        MessageSentEvent(contact, eventTime, message);
-                }
-                else
-                {
-                    if (MessageReceivedEvent != null)
-                        MessageReceivedEvent(contact, eventTime, message);
-                }
-            }
+                    using (var pDBEventGetText = new AutoPtr(
+                        Marshal.AllocHGlobal(Marshal.SizeOf(
+                            typeof(DBEventGetText)))))
+                    {
+                        var getText = new DBEventGetText();
+                        getText.dbei = pDBEventInfo;
+                        getText.datatype = Utils.DBVT_ASCIIZ;
+                        getText.codepage = 1251;
 
-            Marshal.FreeHGlobal(pBlob);
-            Marshal.FreeHGlobal(pDBEventInfo);            
+                        Marshal.StructureToPtr(getText, pDBEventGetText, false);
+
+                        IntPtr pString = pluginLink.CallService(
+                            "DB/Event/GetText", IntPtr.Zero, pDBEventGetText);
+                        string message = Marshal.PtrToStringAnsi(pString);
+
+                        mmi.mmi_free(pString);
+
+                        Marshal.FreeHGlobal(pDBEventGetText);
+
+                        var contact = new Contact(hContact, pluginLink);
+
+                        DateTime eventTime = new DateTime(1970, 1, 1).
+                            AddSeconds(eventInfo.timestamp).ToUniversalTime();
+                        if ((eventInfo.flags & DBEventInfo.DBEF_SENT) != 0)
+                        {
+                            if (MessageSentEvent != null)
+                                MessageSentEvent(contact, eventTime, message);
+                        }
+                        else
+                        {
+                            if (MessageReceivedEvent != null)
+                                MessageReceivedEvent(contact, eventTime,
+                                    message);
+                        }
+                    }
+                }
+            }          
 
             return 0;
         }
