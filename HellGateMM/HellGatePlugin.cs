@@ -91,8 +91,6 @@ namespace HellGateMM
 
                         mmi.mmi_free(pString);
 
-                        Marshal.FreeHGlobal(pDBEventGetText);
-
                         var contact = new Contact(hContact, pluginLink);
 
                         DateTime eventTime = new DateTime(1970, 1, 1).
