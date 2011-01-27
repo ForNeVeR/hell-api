@@ -52,17 +52,20 @@
     <AllowUnsafeBlocks>false</AllowUnsafeBlocks>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="PresentationCore" />
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="System.Data" />
     <Reference Include="System.Xml" />
+    <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AutoPtr.cs" />
     <Compile Include="FirstCircle\Contact.cs" />
     <Compile Include="FirstCircle\DatabaseConnector.cs" />
+    <Compile Include="FirstCircle\OptionsPageInterface.cs" />
     <Compile Include="LastCircle\CList\CListMenuItem.cs" />
     <Compile Include="LastCircle\Contacts\ContactInfo.cs" />
     <Compile Include="LastCircle\Database\DBContactGetSetting.cs" />
@@ -75,6 +78,9 @@
     <Compile Include="LastCircle\Options\OptionsDialogPage.cs" />
     <Compile Include="LastCircle\Options\Utils.cs" />
     <Compile Include="LastCircle\System\MMInterface.cs" />
+    <Compile Include="LastCircle\WinAPI\Constants.cs" />
+    <Compile Include="LastCircle\WinAPI\Functions.cs" />
+    <Compile Include="LastCircle\WinAPI\NMHDR.cs" />
     <Compile Include="Plugin.cs" />
     <Compile Include="MirandaPluginAttribute.cs" />
     <Compile Include="PluginLink.cs" />

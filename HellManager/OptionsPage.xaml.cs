@@ -1,45 +1,24 @@
 ﻿using System;
-using System.Runtime.InteropServices;
+using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Interop;
-using Hell.LastCircle.Options;
+using Hell.FirstCircle;
 
 namespace Hell
 {
     /// <summary>
     /// Options page for controlling of managed plugins.
     /// </summary>
-    public partial class OptionsPage : UserControl
+    public partial class OptionsPage : UserControl, IDisposable
     {
-        /// <summary>
-        /// Handle of DLL instance.
-        /// </summary>
-        private IntPtr hInstance;
-
-        /// <summary>
-        /// Reference to object containing various Miranda service functions.
-        /// </summary>
-        private PluginLink pluginLink;
-
         /// <summary>
         /// Reference to associated plugin manager.
         /// </summary>
         private HellManager manager;
-        
-        /// <summary>
-        /// Hook for creating options page.
-        /// </summary>
-        private MirandaHook optInitialise;
 
         /// <summary>
-        /// DlgProc delegate.
+        /// Miranda options interface connector.
         /// </summary>
-        private OptionsDialogPage.DlgProc dlgProc;
-
-        /// <summary>
-        /// Object for handling WPF object hosting in native environment.
-        /// </summary>
-        private HwndSource hwndSource;
+        private OptionsPageInterface pageInterface;
         
         /// <summary>
         /// Creates page and sets up loading of page into Miranda options
@@ -56,14 +35,10 @@ namespace Hell
         {
             InitializeComponent();
 
-            this.hInstance = hInstance;
-            this.pluginLink = pluginLink;
             this.manager = manager;
 
-            optInitialise = OptInitialise;
-            dlgProc = DlgProc;
-
-            pluginLink.HookEvent("Opt/Initialise", optInitialise);
+            pageInterface = new OptionsPageInterface(pluginLink, hInstance,
+                "Plugins", "Managed Plugins", "Hell.HellManager", this);
 
             foreach (Type type in manager.LoadedTypes)
                 PluginsDataGrid.Items.Add(new PluginDataGridRow(type,
@@ -72,61 +47,20 @@ namespace Hell
             foreach (Type type in manager.UnloadedTypes)
                 PluginsDataGrid.Items.Add(new PluginDataGridRow(type,
                     PluginDataGridRow.State.Unloaded));
-
         }
 
         /// <summary>
-        /// Method for initialising Miranda options dialog.
+        /// Method for releasing resources grabbed by options page.
         /// </summary>
-        /// <param name="wParam">
-        /// Pointer that should be passed to Opt/AddPage service.
-        /// </param>
-        /// <param name="lParam">
-        /// Unused.
-        /// </param>
-        private int OptInitialise(IntPtr wParam, IntPtr lParam)
+        public void Dispose()
         {
-            IntPtr addInfo = wParam;
-
-            using (var pOptionPage = new AutoPtr(Marshal.AllocHGlobal(
-                Marshal.SizeOf(typeof(OptionsDialogPage)))))
-            {
-                var optionPage = new OptionsDialogPage();
-                optionPage.position = -800000000;
-                optionPage.hInstance = hInstance;
-                optionPage.pszTemplate = new IntPtr(Utils.StubDialogID);
-                optionPage.pszGroup = "Plugins";
-                optionPage.pszTitle = "Managed Plugins";
-                optionPage.pfnDlgProc = dlgProc;
-
-                Marshal.StructureToPtr(optionPage, pOptionPage, false);
-                pluginLink.CallService("Opt/AddPage", addInfo, pOptionPage);
-            }
-
-            return 0;
+            pageInterface.Dispose();
         }
 
-        /// <summary>
-        /// Method processing options page events.
-        /// </summary>
-        IntPtr DlgProc(IntPtr hDlg, uint message, IntPtr wParam, IntPtr hParam)
+        private void EnableButton_Click(object sender, RoutedEventArgs e)
         {
-            if (message == Utils.WM_INITDIALOG)
-            {
-                var parameters =
-                    new HwndSourceParameters("ManagedPluginsOptionsPage");
-                parameters.PositionX = 0;
-                parameters.PositionY = 0;
-                parameters.Width = Utils.MirandaOptionsWidth;
-                parameters.Height = Utils.MirandaOptionsHeight;
-                parameters.ParentWindow = hDlg;
-                parameters.WindowStyle = Utils.WS_VISIBLE | Utils.WS_CHILD;
-                
-                hwndSource = new HwndSource(parameters);
-                hwndSource.RootVisual = this;
-            }
-
-            return IntPtr.Zero;
+            // TODO: Enable selected plugin.
+            pageInterface.ActivateApplyButton();
         }
     }
 }

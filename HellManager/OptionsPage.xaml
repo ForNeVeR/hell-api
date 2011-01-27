@@ -17,7 +17,7 @@
             </DataGrid.Columns>
         </DataGrid>
         <StackPanel Grid.Row="1" Orientation="Horizontal">
-            <Button Name="EnableButton" Margin="5">Enable</Button>
+            <Button Name="EnableButton" Margin="5" Click="EnableButton_Click">Enable</Button>
             <Button Name="DisableButton" Margin="5">Disable</Button>
         </StackPanel>
     </Grid>

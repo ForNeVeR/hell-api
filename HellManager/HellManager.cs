@@ -101,6 +101,8 @@ namespace Hell
         /// </summary>
         public override void Unload()
         {
+            options.Dispose();
+            
             foreach (Plugin plugin in loadedPlugins)
             {
                 plugin.Unload();

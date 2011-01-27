@@ -65,7 +65,7 @@ namespace Hell
         /// </summary>
         public override void Unload()
         {
-            
+            // TODO: Delete menu item, unhook event.
         }
 
         /// <summary>
