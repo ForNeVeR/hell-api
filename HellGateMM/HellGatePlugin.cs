@@ -83,7 +83,8 @@ namespace HellGateMM
                         getText.datatype = Utils.DBVT_ASCIIZ;
                         getText.codepage = 1251;
 
-                        Marshal.StructureToPtr(getText, pDBEventGetText, false);
+                        Marshal.StructureToPtr(getText, pDBEventGetText,
+                            false);
 
                         IntPtr pString = pluginLink.CallService(
                             "DB/Event/GetText", IntPtr.Zero, pDBEventGetText);

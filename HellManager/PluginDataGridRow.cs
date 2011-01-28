@@ -12,12 +12,12 @@ namespace Hell
             AboutToUnload
         }
 
-        private Type type;
-        public State LoadState { get; set; }
+        internal Type Type;
+        internal State LoadState;
 
         public PluginDataGridRow(Type type, State state)
         {
-            this.type = type;
+            this.Type = type;
             this.LoadState = state;
         }
         
@@ -25,7 +25,7 @@ namespace Hell
         {
             get
             {
-                return type.FullName;
+                return Type.FullName;
             }
         }
 

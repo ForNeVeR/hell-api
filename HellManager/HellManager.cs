@@ -74,23 +74,17 @@ namespace Hell
             Database = new DatabaseConnector(pluginLink);
 
             string[] settings = Database.EnumSettings("HellAdapter");
-            foreach (Type type in UnloadedTypes)
+            // Call new List<Type> here for making copy of list, because list
+            // itself can be changed during plugin loading.
+            foreach (Type type in new List<Type>(UnloadedTypes))
             {
                 bool hasOption = settings.Contains(type.FullName);
                 if ((hasOption && (byte)Database.GetSetting("HellAdapter",
                     type.FullName) == 1) || !hasOption)
                 {
-                    var plugin = type.GetConstructor(new Type[0]).Invoke(
-                        new object[0]) as Plugin;
-                    plugin.Load(hInstance, pluginLink);
-                    
-                    loadedPlugins.Add(plugin);
-                    LoadedTypes.Add(type);
+                    LoadType(type);
                 }
             }
-
-            foreach (Type type in LoadedTypes)
-                UnloadedTypes.Remove(type);
 
             options = new OptionsPage(hInstance, pluginLink, this);
         }
@@ -109,6 +103,50 @@ namespace Hell
             }
 
             loadedPlugins.Clear();
+        }
+
+        /// <summary>
+        /// Loads specified plugin type instance. Moves it from list
+        /// UnloadedTypes into LoadedTypes.
+        /// </summary>
+        /// <param name="pluginType">
+        /// Plugin type; must be inherited from Plugin.
+        /// </param>
+        internal void LoadType(Type pluginType)
+        {
+            var plugin = pluginType.GetConstructor(new Type[0]).Invoke(
+                new object[0]) as Plugin;
+            plugin.Load(hInstance, pluginLink);
+
+            loadedPlugins.Add(plugin);
+            if (UnloadedTypes.Contains(pluginType))
+                UnloadedTypes.Remove(pluginType);
+            LoadedTypes.Add(pluginType);
+        }
+
+        /// <summary>
+        /// Unloads all instances of specified plugins. Moves it from list
+        /// LoadedTypes into UnloadedTypes.
+        /// </summary>
+        /// <param name="pluginType">
+        /// Plugin type; must be inherited from Plugin.
+        /// </param>
+        internal void UnloadType(Type pluginType)
+        {
+            foreach (Plugin plugin in loadedPlugins)
+            {
+                if (plugin.GetType() == pluginType)
+                {
+                    plugin.Unload();
+                }
+            }
+
+            loadedPlugins.RemoveAll(
+                (plugin) => plugin.GetType() == pluginType);
+
+            if (LoadedTypes.Contains(pluginType))
+                LoadedTypes.Remove(pluginType);
+            UnloadedTypes.Add(pluginType);
         }
     }
 }
