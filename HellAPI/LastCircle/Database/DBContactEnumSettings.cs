@@ -6,6 +6,7 @@ namespace Hell.LastCircle.Database
     [StructLayout(LayoutKind.Sequential, CharSet=CharSet.Ansi)]
     public class DBContactEnumSettings
     {
+        [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
         public delegate int DBSettingsEnumProcDelegate(
             [MarshalAs(UnmanagedType.LPStr)] string szSetting, IntPtr lParam);
         

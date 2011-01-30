@@ -66,10 +66,43 @@ namespace Hell.FirstCircle
             return GetSetting(contact.hContact, moduleName, settingName);
         }
 
+        /// <summary>
+        /// Writes global setting to database.
+        /// </summary>
+        /// <param name="moduleName">
+        /// Name of module that wrote the setting to get.
+        /// </param>
+        /// <param name="settingName">
+        /// Name of setting to get.
+        /// <param name="value">
+        /// Value of one of specified types: byte, ushort, short, uint, int,
+        /// string, byte[].
+        /// </param>
         public void SetSetting(string moduleName, string settingName,
             object value)
         {
+            SetSetting(IntPtr.Zero, moduleName, settingName, value);
+        }
 
+        /// <summary>
+        /// Writes setting to database.
+        /// </summary>
+        /// <param name="Contact">
+        /// Contact whose setting must be gotten.
+        /// </param>
+        /// <param name="moduleName">
+        /// Name of module that wrote the setting to get.
+        /// </param>
+        /// <param name="settingName">
+        /// Name of setting to get.
+        /// <param name="value">
+        /// Value of one of specified types: byte, ushort, short, uint, int,
+        /// string, byte[].
+        /// </param>
+        public void SetContactSetting(Contact contact, string moduleName,
+            string settingName, object value)
+        {
+            SetSetting(contact.hContact, moduleName, settingName, value);
         }
 
         /// <summary>
