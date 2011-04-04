@@ -17,31 +17,24 @@
  * along with Hell API. If not, see <http://www.gnu.org/licenses/>.
  */
 
-using System;
 using System.Windows.Controls;
 using Hell.FirstCircle;
 
 namespace HellGateMM.GUI
 {
-    class ContactTabItem : TabItem
+    class ChatTabItem : TabItem
     {
         private MessagingWindow window;
-        private ContactTabContent tabContent;
+        private ChatTabContent tabContent;
         public Contact Contact { get; private set; }
 
-        public ContactTabItem(MessagingWindow parentWindow, Contact contact)
+        public ChatTabItem(MessagingWindow parentWindow, Contact contact)
         {
             window = parentWindow;
             Contact = contact;
             Header = Contact.Nickname;
-            tabContent = new ContactTabContent(this, contact);
+            tabContent = new ChatTabContent();
             Content = tabContent;
-        }
-
-        public void AddMessage(DateTime time, string message, bool incoming)
-        {
-            tabContent.Chat.Text += String.Format("\n{0} <{1}> {2}",
-                time, incoming ? Contact.Nickname : "Me", message);
         }
 
         public void Delete()

@@ -17,19 +17,18 @@
  * along with Hell API. If not, see <http://www.gnu.org/licenses/>.
  */
 
-using System;
-using System.Runtime.InteropServices;
+using System.Windows.Controls;
 
-namespace Hell.LastCircle.WinAPI
+namespace HellGateMM.GUI
 {
     /// <summary>
-    /// NMHDR WinAPI class.
+    /// Interaction logic for ChatTabContent.xaml
     /// </summary>
-    [StructLayout(LayoutKind.Sequential)]
-    public class NMHDR
+    public partial class ChatTabContent : UserControl
     {
-        public IntPtr hwndFrom;
-        public UIntPtr idFrom;
-        public uint code;
+        public ChatTabContent()
+        {
+            InitializeComponent();
+        }
     }
 }
