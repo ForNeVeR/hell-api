@@ -13,6 +13,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HellGateMM", "HellGateMM\He
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HellManager", "HellManager\HellManager.csproj", "{27C52CFC-2A60-411F-96DC-8E31881A1DE6}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Gateman", "Gateman\Gateman.csproj", "{A3AB71DE-CFAA-4D9F-BE9F-FB0C9CD5FC77}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug Deploy|Win32 = Debug Deploy|Win32
@@ -95,6 +97,18 @@ Global
 		{27C52CFC-2A60-411F-96DC-8E31881A1DE6}.Release|Win32.Build.0 = Release|Any CPU
 		{27C52CFC-2A60-411F-96DC-8E31881A1DE6}.Release|x64.ActiveCfg = Release|Any CPU
 		{27C52CFC-2A60-411F-96DC-8E31881A1DE6}.Release|x64.Build.0 = Release|Any CPU
+		{A3AB71DE-CFAA-4D9F-BE9F-FB0C9CD5FC77}.Debug Deploy|Win32.ActiveCfg = Debug|Any CPU
+		{A3AB71DE-CFAA-4D9F-BE9F-FB0C9CD5FC77}.Debug Deploy|Win32.Build.0 = Debug|Any CPU
+		{A3AB71DE-CFAA-4D9F-BE9F-FB0C9CD5FC77}.Debug Deploy|x64.ActiveCfg = Debug|Any CPU
+		{A3AB71DE-CFAA-4D9F-BE9F-FB0C9CD5FC77}.Debug Deploy|x64.Build.0 = Debug|Any CPU
+		{A3AB71DE-CFAA-4D9F-BE9F-FB0C9CD5FC77}.Debug|Win32.ActiveCfg = Debug|Any CPU
+		{A3AB71DE-CFAA-4D9F-BE9F-FB0C9CD5FC77}.Debug|Win32.Build.0 = Debug|Any CPU
+		{A3AB71DE-CFAA-4D9F-BE9F-FB0C9CD5FC77}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{A3AB71DE-CFAA-4D9F-BE9F-FB0C9CD5FC77}.Debug|x64.Build.0 = Debug|Any CPU
+		{A3AB71DE-CFAA-4D9F-BE9F-FB0C9CD5FC77}.Release|Win32.ActiveCfg = Release|Any CPU
+		{A3AB71DE-CFAA-4D9F-BE9F-FB0C9CD5FC77}.Release|Win32.Build.0 = Release|Any CPU
+		{A3AB71DE-CFAA-4D9F-BE9F-FB0C9CD5FC77}.Release|x64.ActiveCfg = Release|Any CPU
+		{A3AB71DE-CFAA-4D9F-BE9F-FB0C9CD5FC77}.Release|x64.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

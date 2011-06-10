@@ -21,16 +21,39 @@ using System;
 using System.Runtime.InteropServices;
 using Hell.LastCircle.Contacts;
 using Hell.LastCircle.Database;
+using System.Collections.Generic;
 
 namespace Hell.FirstCircle
 {
     /// <summary>
     /// Class representing Miranda contact.
     /// </summary>
-    public class Contact
+    public class Contact : IDisposable
     {
         internal IntPtr hContact;
         private PluginLink pluginLink;
+        private MirandaHook contactSettingChangedHook;
+        private IntPtr hContactSettingChangedHook;
+
+        private bool disposed;
+
+        public enum Status
+        {
+            Offline = 40071,
+            Online = 40072,
+            Away = 40073,
+            DoNotDisturb = 40074,
+            NA = 40075,
+            Occupied = 40076,
+            FreeChat = 40077,
+            Invisible = 40078,
+            OnThePhone = 40079,
+            OutToLunch = 40080
+        }
+
+        public delegate void StatusChangedEventHandler(Contact sender, 
+            Status newStatus);
+        public event StatusChangedEventHandler StatusChangedEvent;
 
         /// <summary>
         /// Object constructor.
@@ -42,6 +65,11 @@ namespace Hell.FirstCircle
         {
             this.hContact = hContact;
             this.pluginLink = pluginLink;
+
+            contactSettingChangedHook = ContactSettingChanged;
+            hContactSettingChangedHook =
+                pluginLink.HookEvent("DB/Contact/SettingChanged",
+                contactSettingChangedHook);
         }
 
         /// <summary>
@@ -138,6 +166,57 @@ namespace Hell.FirstCircle
                 pluginLink.CallContactService(hContact, "/SendMsg", IntPtr.Zero,
                     pString);
             }
+        }
+
+        private int ContactSettingChanged(IntPtr wParam, IntPtr lParam)
+        {
+            IntPtr changedHContact = wParam;
+            if (changedHContact == hContact)
+            {
+                IntPtr pDBContactWriteSetting = lParam;
+                var setting = new DBContactWriteSetting();;
+                Marshal.PtrToStructure(pDBContactWriteSetting, setting);
+
+                // TODO: Check this setting name
+                if (setting.szSetting == "Status" &&
+                    setting.szModule == Protocol)
+                {
+                    Status newStatus = (Status) setting.value.Value.dVal;
+                    if (StatusChangedEvent != null)
+                        StatusChangedEvent(this, newStatus);
+                }
+            }
+            return 0;
+        }
+
+        public void Dispose()
+        {
+            disposed = true;
+            pluginLink.UnhookEvent(hContactSettingChangedHook);
+        }
+
+        ~Contact()
+        {
+            if (!disposed)
+                Dispose();
+        }
+
+        /// <summary>
+        /// Returns full list of contacts stored in the database.
+        /// </summary>
+        public static IEnumerable<Contact> Enumerate(PluginLink pluginLink)
+        {
+            var result = new List<Contact>();
+            IntPtr hContact = pluginLink.CallService("DB/Contact/FindFirst",
+                IntPtr.Zero, IntPtr.Zero);
+            while (hContact != IntPtr.Zero)
+            {
+                result.Add(new Contact(hContact, pluginLink));
+                hContact = pluginLink.CallService("DB/Contact/FindNext",
+                    hContact, IntPtr.Zero);
+            }
+
+            return result;
         }
 
         public static bool operator ==(Contact c1, Contact c2)
