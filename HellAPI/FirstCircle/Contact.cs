@@ -84,10 +84,7 @@ namespace Hell.FirstCircle
         /// </summary>
         public string Nickname
         {
-            get
-            {
-                
-            }
+            get { return GetContactField(ContactInfo.CNF_NICK); }
         }
 
         /// <summary>
@@ -124,41 +121,7 @@ namespace Hell.FirstCircle
         /// </summary>
         public string Uid
         {
-            get
-            {
-                // TODO: Extract this code (and code of Nickname property) to
-                // some private method.
-
-                // Create ContactInfo object:
-                var info = new ContactInfo();
-                info.hContact = hContact;
-                info.dwFlag = ContactInfo.CNF_UNIQUEID;
-
-                string uid = null;
-
-                using (var pContactInfo = new AutoPtr(
-                    Marshal.AllocHGlobal(Marshal.SizeOf(typeof (ContactInfo)))))
-                {
-                    // Copy ContactInfo to unmanaged memory:
-                    Marshal.StructureToPtr(info, pContactInfo, false);
-
-                    IntPtr result =
-                        pluginLink.CallService("Miranda/Contact/GetContactInfo",
-                                               IntPtr.Zero, pContactInfo);
-
-                    if (result == IntPtr.Zero)
-                    {
-                        info =
-                            (ContactInfo) Marshal.PtrToStructure(pContactInfo,
-                                                                 typeof (
-                                                                     ContactInfo
-                                                                     ));
-                        uid = Marshal.PtrToStringAnsi(info.value.pszVal);
-                    }
-                }
-
-                return uid;
-            }
+            get { return GetContactField(ContactInfo.CNF_UNIQUEID); }
         }
 
         #endregion
@@ -253,6 +216,46 @@ namespace Hell.FirstCircle
             }
         }
 
+        /// <summary>
+        /// Gets contact info string from database.
+        /// </summary>
+        /// <param name="fieldFlag">
+        /// Flag from ContactInfo.CNF_* list.
+        /// </param>
+        /// <returns>
+        /// String from database interpreted as ANSI.
+        /// </returns>
+        private string GetContactField(byte fieldFlag)
+        {
+            // Create ContactInfo object:
+            var info = new ContactInfo();
+            info.hContact = hContact;
+            info.dwFlag = fieldFlag;
+
+            string fieldData = null;
+
+            using (var pContactInfo = new AutoPtr(
+                Marshal.AllocHGlobal(Marshal.SizeOf(typeof (ContactInfo)))))
+            {
+                // Copy ContactInfo to unmanaged memory:
+                Marshal.StructureToPtr(info, pContactInfo, false);
+
+                var result =
+                    pluginLink.CallService("Miranda/Contact/GetContactInfo",
+                                           IntPtr.Zero, pContactInfo);
+
+                if (result == IntPtr.Zero)
+                {
+                    info = (ContactInfo) Marshal.PtrToStructure(pContactInfo,
+                                                                typeof (
+                                                                    ContactInfo));
+                    fieldData = Marshal.PtrToStringAnsi(info.value.pszVal);
+                }
+            }
+
+            return fieldData;
+        }
+
         private int ContactSettingChanged(IntPtr wParam, IntPtr lParam)
         {
             IntPtr changedHContact = wParam;
@@ -284,45 +287,6 @@ namespace Hell.FirstCircle
         {
             if (!disposed)
                 Dispose();
-        }
-
-        /// <summary>
-        /// Gets contact info string from database.
-        /// </summary>
-        /// <param name="fieldFlag">
-        /// Flag from ContactInfo.CNF_* list.
-        /// </param>
-        /// <returns>
-        /// String from database interpreted as ANSI.
-        /// </returns>
-        private string GetContactField(byte fieldFlag)
-        {
-            // Create ContactInfo object:
-            var info = new ContactInfo();
-            info.hContact = hContact;
-            info.dwFlag = fieldFlag;
-
-            string result = null;
-
-            using (var pContactInfo = new AutoPtr(
-                Marshal.AllocHGlobal(Marshal.SizeOf(typeof(ContactInfo)))))
-            {
-                // Copy ContactInfo to unmanaged memory:
-                Marshal.StructureToPtr(info, pContactInfo, false);
-
-                IntPtr result =
-                    pluginLink.CallService("Miranda/Contact/GetContactInfo",
-                        IntPtr.Zero, pContactInfo);
-
-                if (result == IntPtr.Zero)
-                {
-                    info = (ContactInfo)Marshal.PtrToStructure(pContactInfo,
-                        typeof(ContactInfo));
-                    result = Marshal.PtrToStringAnsi(info.value.pszVal);
-                }
-            }
-
-            return result;
         }
     }
 }
