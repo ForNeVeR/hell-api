@@ -65,6 +65,7 @@
     <Compile Include="AutoPtr.cs" />
     <Compile Include="FirstCircle\Contact.cs" />
     <Compile Include="FirstCircle\DatabaseConnector.cs" />
+    <Compile Include="FirstCircle\HistoryItem.cs" />
     <Compile Include="FirstCircle\OptionsPageInterface.cs" />
     <Compile Include="LastCircle\CList\CListMenuItem.cs" />
     <Compile Include="LastCircle\Contacts\ContactInfo.cs" />
