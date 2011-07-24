@@ -42,7 +42,7 @@ namespace Hell
         /// </summary>
         protected override void Load()
         {
-            options = new OptionsPage(pluginLink, hInstance);
+            options = new OptionsPage(PluginLink, HInstance);
         }
 
         /// <summary>

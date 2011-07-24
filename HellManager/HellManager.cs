@@ -90,7 +90,7 @@ namespace Hell
         {
             LoadedTypes = new List<Type>();
 
-            Database = new DatabaseConnector(pluginLink);
+            Database = new DatabaseConnector(PluginLink);
 
             string[] settings = Database.EnumSettings("HellAdapter");
             // Call new List<Type> here for making copy of list, because list
@@ -105,7 +105,7 @@ namespace Hell
                 }
             }
 
-            options = new OptionsPage(hInstance, pluginLink, this);
+            options = new OptionsPage(HInstance, PluginLink, this);
         }
 
         /// <summary>
@@ -135,7 +135,7 @@ namespace Hell
         {
             var plugin = pluginType.GetConstructor(new Type[0]).Invoke(
                 new object[0]) as Plugin;
-            plugin.Load(hInstance, pluginLink);
+            plugin.Load(HInstance, PluginLink);
 
             loadedPlugins.Add(plugin);
             if (UnloadedTypes.Contains(pluginType))

@@ -18,13 +18,12 @@
  */
 
 using System;
-using System.Runtime.InteropServices;
 
 namespace Hell
 {
     /// <summary>
     /// Interface for Miranda plugin. Note that you must NOT try to use
-    /// hInstance or pluginLink fields from constructor. They become available
+    /// HInstance or PluginLink fields from constructor. They become available
     /// only after adapter calls your Load() method.
     /// </summary>
     public abstract class Plugin
@@ -32,12 +31,12 @@ namespace Hell
         /// <summary>
         /// Handle of DLL instance.
         /// </summary>
-        protected IntPtr hInstance;
+        protected IntPtr HInstance { get; private set; }
 
         /// <summary>
         /// Reference to object containing various Miranda service functions.
         /// </summary>
-        protected PluginLink pluginLink;
+        protected PluginLink PluginLink { get; private set; }
 
         /// <summary>
         /// This method will be called first on plugin creation.
@@ -50,8 +49,8 @@ namespace Hell
         /// </param>
         public void Load(IntPtr hInstance, PluginLink pluginLink)
         {
-            this.hInstance = hInstance;
-            this.pluginLink = pluginLink;
+            HInstance = hInstance;
+            PluginLink = pluginLink;
             Load();
         }
 

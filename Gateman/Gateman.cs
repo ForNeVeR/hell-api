@@ -32,7 +32,7 @@ namespace Gateman
 
         protected override void Load()
         {
-            contacts = Contact.Enumerate(pluginLink);
+            contacts = Contact.Enumerate(PluginLink);
             foreach (Contact contact in contacts)
             {
 
