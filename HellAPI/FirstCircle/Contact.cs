@@ -217,6 +217,26 @@ namespace Hell.FirstCircle
         }
 
         /// <summary>
+        /// Method for enumeration of contact history items.
+        /// </summary>
+        /// <returns>
+        /// Enumerator for this contact history.
+        /// </returns>
+        public IEnumerable<HistoryItem> GetHistory()
+        {
+            var hEvent = pluginLink.CallService("DB/Event/FindFirst", hContact,
+                                                IntPtr.Zero);
+            while (hEvent != IntPtr.Zero)
+            {
+                var item = HistoryItem.Load(pluginLink, this, hEvent);
+                yield return item;
+                hEvent = pluginLink.CallService("DB/Event/FindNext", hEvent,
+                                                IntPtr.Zero);
+            }
+            yield break;
+        }
+
+        /// <summary>
         /// Gets contact info string from database.
         /// </summary>
         /// <param name="fieldFlag">

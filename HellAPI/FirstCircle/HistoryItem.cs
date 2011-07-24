@@ -1,7 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+using System.Runtime.InteropServices;
+using Hell.LastCircle.Database;
+using Hell.LastCircle.System;
 
 namespace Hell.FirstCircle
 {
@@ -13,37 +13,37 @@ namespace Hell.FirstCircle
         /// <summary>
         /// Event type.
         /// </summary>
-        public enum HistoryItemType
+        public enum HistoryItemType : ushort
         {
             /// <summary>
             /// Regular message.
             /// </summary>
-            Message,
+            Message = DBEventInfo.EVENTTYPE_MESSAGE,
 
             /// <summary>
             /// URL.
             /// </summary>
-            Url,
+            Url = DBEventInfo.EVENTTYPE_URL,
 
             /// <summary>
             /// Contacts data.
             /// </summary>
-            Contacts,
+            Contacts = DBEventInfo.EVENTTYPE_CONTACTS,
 
             /// <summary>
             /// "Contact added you" event.
             /// </summary>
-            Added,
+            Added = DBEventInfo.EVENTTYPE_ADDED,
 
             /// <summary>
             /// Authentication request.
             /// </summary>
-            AuthRequest,
+            AuthRequest = DBEventInfo.EVENTTYPE_AUTHREQUEST,
 
             /// <summary>
             /// File.
             /// </summary>
-            File
+            File = DBEventInfo.EVENTTYPE_FILE
         }
 
         #region Data fields and properties
@@ -52,11 +52,6 @@ namespace Hell.FirstCircle
         /// Contact to whom event is assigned.
         /// </summary>
         public Contact Contact { get; set; }
-
-        /// <summary>
-        /// Module name of event.
-        /// </summary>
-        public string ModuleName { get; set; }
 
         /// <summary>
         /// Type of this event.
@@ -108,7 +103,6 @@ namespace Hell.FirstCircle
             if (ReferenceEquals(null, other)) return false;
             if (ReferenceEquals(this, other)) return true;
             return Equals(other.Contact, Contact) &&
-                   Equals(other.ModuleName, ModuleName) &&
                    Equals(other.Type, Type) &&
                    Equals(other.MessageText, MessageText) &&
                    other.DateTime.Equals(DateTime);
@@ -125,8 +119,6 @@ namespace Hell.FirstCircle
             unchecked
             {
                 int result = (Contact != null ? Contact.GetHashCode() : 0);
-                result = (result * 397) ^
-                         (ModuleName != null ? ModuleName.GetHashCode() : 0);
                 result = (result * 397) ^ Type.GetHashCode();
                 result = (result * 397) ^
                          (MessageText != null ? MessageText.GetHashCode() : 0);
@@ -164,7 +156,70 @@ namespace Hell.FirstCircle
             Type = type;
         }
 
-        // TODO: Needs methods for saving / loading from / to database. Also
-        // XML (de)serializing for transporting.
+        /// <summary>
+        /// Creates instance of history item and loads its content from
+        /// database.
+        /// </summary>
+        /// <param name="pluginLink">
+        /// Object containing Miranda services.
+        /// </param>
+        /// <param name="hEvent">
+        /// Miranda event handle.
+        /// </param>
+        internal static HistoryItem Load(PluginLink pluginLink, Contact contact,
+            IntPtr hEvent)
+        {
+            if (hEvent == IntPtr.Zero)
+                throw new ArgumentException("hEvent cannot be zero.");
+
+            // Miranda interface for freeing strings:
+            var mmi = MMInterface.GetMMI(pluginLink);
+
+            using (var pDbEventInfo = new AutoPtr(Marshal.AllocHGlobal(
+                Marshal.SizeOf(typeof(DBEventInfo)))))
+            {
+                var result = pluginLink.CallService("DB/Event/Get", hEvent,
+                                                    pDbEventInfo);
+                if (result != IntPtr.Zero)
+                    throw new DatabaseException();
+
+                var eventInfo =
+                    (DBEventInfo)
+                    Marshal.PtrToStructure(pDbEventInfo, typeof (DBEventInfo));
+
+                var historyItem =
+                    new HistoryItem((HistoryItemType) eventInfo.eventType);
+                if (historyItem.Type == HistoryItemType.Message)
+                {
+                    // Get message text:
+                    using (var pDbEventGetText = new AutoPtr(
+                        Marshal.AllocHGlobal(Marshal.SizeOf(
+                        typeof(DBEventGetText)))))
+                    {
+                        var getText = new DBEventGetText();
+                        getText.dbei = pDbEventInfo;
+                        getText.datatype = Utils.DBVT_WCHAR;
+
+                        Marshal.StructureToPtr(getText, pDbEventGetText, false);
+
+                        IntPtr pString = pluginLink.CallService(
+                            "DB/Event/GetText", IntPtr.Zero, pDbEventGetText);
+                        mmi.mmi_free(pString);
+
+                        var message = Marshal.PtrToStringUni(pString);
+                        historyItem.MessageText = message;
+                    }
+                }
+
+                historyItem.Contact = contact;
+                historyItem.DateTime = new DateTime(1970, 1, 1)
+                    .AddSeconds(eventInfo.timestamp);
+
+                return historyItem;
+            }
+        }
+
+        // TODO: Needs methods for saving to database. Also XML (de)serializing
+        // for transporting.
     }
 }
