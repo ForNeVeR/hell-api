@@ -30,7 +30,7 @@ namespace Styx
     {
         /// <summary>
         /// This method will be called by adapter system when all preparations
-        /// for plugin loading done (i.e. calling private Load method).
+        /// for plugin loading done.
         /// </summary>
         protected override void Load()
         {

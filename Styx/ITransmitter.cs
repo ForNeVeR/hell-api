@@ -5,6 +5,11 @@ using System.Text;
 
 namespace Styx
 {
+    /// <summary>
+    /// Interface for classes implementing data transmission between current
+    /// storage node (current Miranda instance / history database) and remote
+    /// instance.
+    /// </summary>
     interface ITransmitter
     {
     }
