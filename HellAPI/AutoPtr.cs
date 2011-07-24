@@ -31,12 +31,12 @@ namespace Hell
         /// <summary>
         /// Associated pointer.
         /// </summary>
-        private IntPtr ptr;
+        private IntPtr _ptr;
 
         /// <summary>
         /// Pointer status indicator.
         /// </summary>
-        private bool disposed = false;
+        private bool _disposed = false;
         
         /// <summary>
         /// AutoPtr constructor.
@@ -47,7 +47,7 @@ namespace Hell
         /// </param>
         public AutoPtr(IntPtr pointer)
         {
-            ptr = pointer;
+            _ptr = pointer;
         }
 
         /// <summary>
@@ -61,26 +61,47 @@ namespace Hell
         /// </returns>
         public static implicit operator IntPtr(AutoPtr a)
         {
-            return a.ptr;
+            if (a._disposed)
+                throw new ObjectDisposedException("a");
+
+            return a._ptr;
         }
 
         /// <summary>
-        /// Frees associated pointer.
+        /// Recycles object. Frees associated pointer.
         /// </summary>
         public void Dispose()
         {
-            disposed = true;
-            if (ptr != IntPtr.Zero)
-                Marshal.FreeHGlobal(ptr);
+            Dispose(true);
+            GC.SuppressFinalize(this);
         }
 
         /// <summary>
-        /// AutoPtr destructor.
+        /// Private implementation of IDisposable pattern.
+        /// </summary>
+        /// <param name="disposing">
+        /// Variable indicates source of this method call: was it called by
+        /// Dispose() method or by finalizer.
+        /// </param>
+        private void Dispose(bool disposing)
+        {
+            if (_disposed)
+                return;
+
+            if (_ptr != IntPtr.Zero)
+            {
+                Marshal.FreeHGlobal(_ptr);
+                _ptr = IntPtr.Zero;
+            }
+            _disposed = true;
+        }
+
+        /// <summary>
+        /// AutoPtr finalizer.
         /// </summary>
         ~AutoPtr()
         {
-            if (!disposed)
-                Dispose();
+            Dispose(false);
         }
     }
 }
