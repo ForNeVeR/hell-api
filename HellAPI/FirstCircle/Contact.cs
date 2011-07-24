@@ -30,13 +30,6 @@ namespace Hell.FirstCircle
     /// </summary>
     public class Contact : IDisposable
     {
-        internal IntPtr hContact;
-        private PluginLink pluginLink;
-        private MirandaHook contactSettingChangedHook;
-        private IntPtr hContactSettingChangedHook;
-
-        private bool disposed;
-
         public enum Status
         {
             Offline = 40071,
@@ -54,23 +47,37 @@ namespace Hell.FirstCircle
         public delegate void StatusChangedEventHandler(Contact sender, 
             Status newStatus);
         public event StatusChangedEventHandler StatusChangedEvent;
+        
+        #region Static methods
 
         /// <summary>
-        /// Object constructor.
+        /// Returns full list of contacts stored in the database.
         /// </summary>
-        /// <param name="hContact">
-        /// Handle used for various Miranda contact manipulations.
-        /// </param>
-        public Contact(IntPtr hContact, PluginLink pluginLink)
+        public static IEnumerable<Contact> Enumerate(PluginLink pluginLink)
         {
-            this.hContact = hContact;
-            this.pluginLink = pluginLink;
+            var result = new List<Contact>();
+            IntPtr hContact = pluginLink.CallService("DB/Contact/FindFirst",
+                IntPtr.Zero, IntPtr.Zero);
+            while (hContact != IntPtr.Zero)
+            {
+                result.Add(new Contact(hContact, pluginLink));
+                hContact = pluginLink.CallService("DB/Contact/FindNext",
+                    hContact, IntPtr.Zero);
+            }
 
-            contactSettingChangedHook = ContactSettingChanged;
-            hContactSettingChangedHook =
-                pluginLink.HookEvent("DB/Contact/SettingChanged",
-                contactSettingChangedHook);
+            return result;
         }
+
+        #endregion
+
+        #region Data fields and properties
+
+        internal IntPtr hContact;
+        private PluginLink pluginLink;
+        private MirandaHook contactSettingChangedHook;
+        private IntPtr hContactSettingChangedHook;
+
+        private bool disposed;
 
         /// <summary>
         /// Nickname of contact from database.
@@ -79,32 +86,7 @@ namespace Hell.FirstCircle
         {
             get
             {
-                // Create ContactInfo object:
-                var info = new ContactInfo();
-                info.hContact = hContact;
-                info.dwFlag = ContactInfo.CNF_NICK;
-
-                string nick = null;
                 
-                using (var pContactInfo = new AutoPtr(
-                    Marshal.AllocHGlobal(Marshal.SizeOf(typeof(ContactInfo)))))
-                {
-                    // Copy ContactInfo to unmanaged memory:
-                    Marshal.StructureToPtr(info, pContactInfo, false);
-
-                    IntPtr result =
-                        pluginLink.CallService("Miranda/Contact/GetContactInfo",
-                            IntPtr.Zero, pContactInfo);
-
-                    if (result == IntPtr.Zero)
-                    {
-                        info = (ContactInfo)Marshal.PtrToStructure(pContactInfo,
-                            typeof(ContactInfo));
-                        nick = Marshal.PtrToStringAnsi(info.value.pszVal);
-                    }
-                }
-
-                return nick;
             }
         }
 
@@ -135,6 +117,109 @@ namespace Hell.FirstCircle
 
                 return info.szProto;
             }
+        }
+
+        /// <summary>
+        /// Unique user Id.
+        /// </summary>
+        public string Uid
+        {
+            get
+            {
+                // TODO: Extract this code (and code of Nickname property) to
+                // some private method.
+
+                // Create ContactInfo object:
+                var info = new ContactInfo();
+                info.hContact = hContact;
+                info.dwFlag = ContactInfo.CNF_UNIQUEID;
+
+                string uid = null;
+
+                using (var pContactInfo = new AutoPtr(
+                    Marshal.AllocHGlobal(Marshal.SizeOf(typeof (ContactInfo)))))
+                {
+                    // Copy ContactInfo to unmanaged memory:
+                    Marshal.StructureToPtr(info, pContactInfo, false);
+
+                    IntPtr result =
+                        pluginLink.CallService("Miranda/Contact/GetContactInfo",
+                                               IntPtr.Zero, pContactInfo);
+
+                    if (result == IntPtr.Zero)
+                    {
+                        info =
+                            (ContactInfo) Marshal.PtrToStructure(pContactInfo,
+                                                                 typeof (
+                                                                     ContactInfo
+                                                                     ));
+                        uid = Marshal.PtrToStringAnsi(info.value.pszVal);
+                    }
+                }
+
+                return uid;
+            }
+        }
+
+        #endregion
+
+        #region Equality stuff
+
+        public override bool Equals(object obj)
+        {
+            if (obj is Contact)
+                return hContact == (obj as Contact).hContact;
+            else
+                return false;
+        }
+
+        public bool Equals(Contact other)
+        {
+            if (ReferenceEquals(null, other)) return false;
+            if (ReferenceEquals(this, other)) return true;
+            return other.hContact.Equals(hContact) &&
+                   Equals(other.pluginLink, pluginLink);
+        }
+
+        /// <summary>
+        /// Hash code is calculated uisng protocol name and user id because it
+        /// may be shared with another Miranda instance.
+        /// </summary>
+        public override int GetHashCode()
+        {
+            unchecked
+            {
+                return (Protocol.GetHashCode() * 397) ^ Uid.GetHashCode();
+            }
+        }
+
+        public static bool operator ==(Contact c1, Contact c2)
+        {
+            return c1.Equals(c2);
+        }
+
+        public static bool operator !=(Contact c1, Contact c2)
+        {
+            return !c1.Equals(c2);
+        }
+
+        #endregion
+
+        /// <summary>
+        /// Object constructor.
+        /// </summary>
+        /// <param name="hContact">
+        /// Handle used for various Miranda contact manipulations.
+        /// </param>
+        public Contact(IntPtr hContact, PluginLink pluginLink)
+        {
+            this.hContact = hContact;
+            this.pluginLink = pluginLink;
+
+            contactSettingChangedHook = ContactSettingChanged;
+            hContactSettingChangedHook =
+                pluginLink.HookEvent("DB/Contact/SettingChanged",
+                contactSettingChangedHook);
         }
 
         /// <summary>
@@ -202,44 +287,42 @@ namespace Hell.FirstCircle
         }
 
         /// <summary>
-        /// Returns full list of contacts stored in the database.
+        /// Gets contact info string from database.
         /// </summary>
-        public static IEnumerable<Contact> Enumerate(PluginLink pluginLink)
+        /// <param name="fieldFlag">
+        /// Flag from ContactInfo.CNF_* list.
+        /// </param>
+        /// <returns>
+        /// String from database interpreted as ANSI.
+        /// </returns>
+        private string GetContactField(byte fieldFlag)
         {
-            var result = new List<Contact>();
-            IntPtr hContact = pluginLink.CallService("DB/Contact/FindFirst",
-                IntPtr.Zero, IntPtr.Zero);
-            while (hContact != IntPtr.Zero)
+            // Create ContactInfo object:
+            var info = new ContactInfo();
+            info.hContact = hContact;
+            info.dwFlag = fieldFlag;
+
+            string result = null;
+
+            using (var pContactInfo = new AutoPtr(
+                Marshal.AllocHGlobal(Marshal.SizeOf(typeof(ContactInfo)))))
             {
-                result.Add(new Contact(hContact, pluginLink));
-                hContact = pluginLink.CallService("DB/Contact/FindNext",
-                    hContact, IntPtr.Zero);
+                // Copy ContactInfo to unmanaged memory:
+                Marshal.StructureToPtr(info, pContactInfo, false);
+
+                IntPtr result =
+                    pluginLink.CallService("Miranda/Contact/GetContactInfo",
+                        IntPtr.Zero, pContactInfo);
+
+                if (result == IntPtr.Zero)
+                {
+                    info = (ContactInfo)Marshal.PtrToStructure(pContactInfo,
+                        typeof(ContactInfo));
+                    result = Marshal.PtrToStringAnsi(info.value.pszVal);
+                }
             }
 
             return result;
-        }
-
-        public static bool operator ==(Contact c1, Contact c2)
-        {
-            return c1.Equals(c2);
-        }
-
-        public static bool operator !=(Contact c1, Contact c2)
-        {
-            return !c1.Equals(c2);
-        }
-
-        public override bool Equals(object obj)
-        {
-            if (obj is Contact)
-                return hContact == (obj as Contact).hContact;
-            else
-                return false;
-        }
-
-        public override int GetHashCode()
-        {
-            return hContact.GetHashCode();
         }
     }
 }
