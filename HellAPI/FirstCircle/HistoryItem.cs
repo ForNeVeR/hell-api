@@ -163,6 +163,9 @@ namespace Hell.FirstCircle
         /// <param name="pluginLink">
         /// Object containing Miranda services.
         /// </param>
+        /// <param name="contact">
+        /// Contact with whom history this item is associated.
+        /// </param>
         /// <param name="hEvent">
         /// Miranda event handle.
         /// </param>
