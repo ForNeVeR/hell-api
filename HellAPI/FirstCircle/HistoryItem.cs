@@ -46,6 +46,22 @@ namespace Hell.FirstCircle
             File = DBEventInfo.EVENTTYPE_FILE
         }
 
+        /// <summary>
+        /// Event direction: incoming, outgoing.
+        /// </summary>
+        public enum HistoryItemDirection : int
+        {
+            /// <summary>
+            /// This is (sort of) message that has been recieved from contact.
+            /// </summary>
+            Incoming,
+
+            /// <summary>
+            /// This is (sort of) message that has been sent to contact.
+            /// </summary>
+            Outgoing
+        }
+
         #region Data fields and properties
 
         /// <summary>
@@ -57,6 +73,11 @@ namespace Hell.FirstCircle
         /// Type of this event.
         /// </summary>
         public HistoryItemType Type { get; private set; }
+
+        /// <summary>
+        /// Direction of this event.
+        /// </summary>
+        public HistoryItemDirection Direction { get; private set; }
 
         /// <summary>
         /// Text of message (if this event is message).
@@ -151,9 +172,13 @@ namespace Hell.FirstCircle
         /// <param name="type">
         /// Type of created item.
         /// </param>
-        public HistoryItem(HistoryItemType type)
+        /// <param name="direction">
+        /// Direction of created item.
+        /// </param>
+        public HistoryItem(HistoryItemType type, HistoryItemDirection direction)
         {
             Type = type;
+            Direction = direction;
         }
 
         /// <summary>
@@ -190,9 +215,12 @@ namespace Hell.FirstCircle
                     (DBEventInfo)
                     Marshal.PtrToStructure(pDbEventInfo, typeof (DBEventInfo));
 
-                var historyItem =
-                    new HistoryItem((HistoryItemType) eventInfo.eventType);
-                if (historyItem.Type == HistoryItemType.Message)
+                var type = (HistoryItemType) eventInfo.eventType;
+                var direction = (eventInfo.flags & DBEventInfo.DBEF_SENT) != 0
+                                    ? HistoryItemDirection.Outgoing
+                                    : HistoryItemDirection.Incoming;
+                var historyItem = new HistoryItem(type, direction);
+                if (type == HistoryItemType.Message)
                 {
                     // Get message text:
                     using (var pDbEventGetText = new AutoPtr(
@@ -205,8 +233,8 @@ namespace Hell.FirstCircle
 
                         Marshal.StructureToPtr(getText, pDbEventGetText, false);
 
-                        IntPtr pString = pluginLink.CallService(
-                            "DB/Event/GetText", IntPtr.Zero, pDbEventGetText);
+                        var pString = pluginLink.CallService("DB/Event/GetText",
+                            IntPtr.Zero, pDbEventGetText);
                         mmi.mmi_free(pString);
 
                         var message = Marshal.PtrToStringUni(pString);
@@ -222,7 +250,38 @@ namespace Hell.FirstCircle
             }
         }
 
-        // TODO: Needs methods for saving to database. Also XML (de)serializing
-        // for transporting.
+        /// <summary>
+        /// Saves this history item to database for selected contact.
+        /// </summary>
+         /// <param name="pluginLink">
+        /// Object containing Miranda services.
+        /// </param>
+        public void Save(PluginLink pluginLink)
+        {
+            var eventInfo = new DBEventInfo();
+            eventInfo.eventType = (ushort) Type;
+            eventInfo.flags = DBEventInfo.DBEF_SENT;
+            eventInfo.szModule = Contact.Protocol;
+            eventInfo.timestamp = (int) (DateTime -
+                                         new DateTime(1970, 1, 1)).TotalSeconds;
+
+            using (var pDbEventInfo = new AutoPtr(
+                Marshal.AllocHGlobal(Marshal.SizeOf(typeof(DBEventInfo)))))
+            {
+                if (MessageText != null)
+                {
+                    using (var pString =
+                        new AutoPtr(Marshal.StringToHGlobalAnsi(MessageText)))
+                    {
+                        eventInfo.cbBlob = (uint) MessageText.Length + 1;
+                        eventInfo.pBlob = pString;
+                    }
+                }
+
+                Marshal.StructureToPtr(eventInfo, pDbEventInfo, false);
+                pluginLink.CallService("DB/Event/Add", Contact.hContact,
+                                       pDbEventInfo);
+            }
+        }
     }
 }
