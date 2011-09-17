@@ -20,41 +20,42 @@
  * THE SOFTWARE.
  */
 
-using System;
 using System.Collections.Generic;
-using System.Windows.Forms;
+using System.Linq;
 using Hell;
 using Hell.FirstCircle;
 
 namespace Gateman
 {
+    /// <summary>
+    /// Plugin for logging users online time.
+    /// </summary>
     [MirandaPluginAttribute]
     public class Gateman : Plugin
     {
-        IEnumerable<Contact> contacts;
+        private IList<Contact> _contacts;
 
         protected override void Load()
         {
-            contacts = Contact.Enumerate(PluginLink);
-            foreach (Contact contact in contacts)
+            // TODO: Handle contact creation and deletion.
+            _contacts = Contact.Enumerate(PluginLink).ToList();
+            foreach (Contact contact in _contacts)
             {
-
+                contact.StatusChanged += contact_StatusChangedEvent;
             }
-        }
-
-        public void StatusChanged(Contact contact, Contact.Status status)
-        {
-            MessageBox.Show(
-                String.Format("Contact {0}'s status has changed to {1}.",
-                contact.Nickname, status.ToString()));
         }
 
         public override void Unload()
         {
-            foreach (Contact contact in contacts)
+            foreach (Contact contact in _contacts)
             {
                 contact.Dispose();
             }
+        }
+
+        private void contact_StatusChangedEvent(Contact sender, Contact.Status newStatus)
+        {
+            // TODO: Log status change.
         }
     }
 }
