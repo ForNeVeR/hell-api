@@ -1,0 +1,18 @@
+# Various user options
+*.suo
+*.user
+*.sdf
+*.opensdf
+*.vs10x
+*.filters
+
+# Compiler-generated data directories
+*/bin/
+*/obj/
+
+# Output binary directories
+Debug
+Release
+
+# Tool-generated files and directories
+_ReSharper.Hell
