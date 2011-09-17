@@ -23,7 +23,6 @@
 #include <Windows.h>
 
 #include <newpluginapi.h>
-#include <m_clist.h>
 
 #include "constants.h"
 
