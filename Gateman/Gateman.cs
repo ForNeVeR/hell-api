@@ -22,10 +22,9 @@
 
 using System.Collections.Generic;
 using System.Linq;
-using Hell;
 using Hell.FirstCircle;
 
-namespace Gateman
+namespace Hell.Gateman
 {
     /// <summary>
     /// Plugin for logging users online time.

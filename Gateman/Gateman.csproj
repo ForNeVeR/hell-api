@@ -8,7 +8,7 @@
     <ProjectGuid>{A3AB71DE-CFAA-4D9F-BE9F-FB0C9CD5FC77}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Gateman</RootNamespace>
+    <RootNamespace>Hell.Gateman</RootNamespace>
     <AssemblyName>Gateman</AssemblyName>
     <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
