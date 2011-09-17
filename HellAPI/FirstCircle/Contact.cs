@@ -49,7 +49,11 @@ namespace Hell.FirstCircle
 
         public delegate void StatusChangedEventHandler(Contact sender, 
             Status newStatus);
-        public event StatusChangedEventHandler StatusChangedEvent;
+
+        /// <summary>
+        /// This event is raised on contact status changes.
+        /// </summary>
+        public event StatusChangedEventHandler StatusChanged;
         
         #region Static methods
 
@@ -293,8 +297,8 @@ namespace Hell.FirstCircle
                     setting.szModule == Protocol)
                 {
                     Status newStatus = (Status) setting.value.Value.dVal;
-                    if (StatusChangedEvent != null)
-                        StatusChangedEvent(this, newStatus);
+                    if (StatusChanged != null)
+                        StatusChanged(this, newStatus);
                 }
             }
             return 0;
