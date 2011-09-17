@@ -283,20 +283,28 @@ namespace Hell.FirstCircle
             return fieldData;
         }
 
+        /// <summary>
+        /// This method is called on contact status change.
+        /// </summary>
+        /// <param name="wParam">Handle of chagned contact.</param>
+        /// <param name="lParam">
+        /// Pointer to DBContactWriteSetting structure.
+        /// </param>
+        /// <returns>Always zero.</returns>
         private int ContactSettingChanged(IntPtr wParam, IntPtr lParam)
         {
             IntPtr changedHContact = wParam;
             if (changedHContact == hContact)
             {
                 IntPtr pDBContactWriteSetting = lParam;
-                var setting = new DBContactWriteSetting();;
+                var setting = new DBContactWriteSetting();
                 Marshal.PtrToStructure(pDBContactWriteSetting, setting);
 
                 // TODO: Check this setting name
-                if (setting.szSetting == "Status" &&
+                if (setting.szSetting == "Status" && 
                     setting.szModule == Protocol)
                 {
-                    Status newStatus = (Status) setting.value.Value.dVal;
+                    var newStatus = (Status) setting.value.Value.wVal;
                     if (StatusChanged != null)
                         StatusChanged(this, newStatus);
                 }
