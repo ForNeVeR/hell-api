@@ -86,8 +86,9 @@ void GetManager()
 {
     List<Type ^> ^pluginsForLoading = gcnew List<Type ^>();
 
-    String ^path =
-        Path::GetDirectoryName(Assembly::GetExecutingAssembly()->Location);
+    String ^path = Path::Combine(
+        Path::GetDirectoryName(Assembly::GetExecutingAssembly()->Location),
+        PLUGIN_DIRECTORY);
     DirectoryInfo ^directory = gcnew DirectoryInfo(path);	
 
     // First, create a list of all managed plugin types.
