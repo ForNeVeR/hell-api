@@ -8,9 +8,9 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyTitle("HellAPI")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("Microsoft")]
-[assembly: AssemblyProduct("HellAPI")]
-[assembly: AssemblyCopyright("Copyright © Microsoft 2011")]
+[assembly: AssemblyCompany("ForNeVeR")]
+[assembly: AssemblyProduct("Hell")]
+[assembly: AssemblyCopyright("Copyright (C) 2010-2011 by ForNeVeR")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 

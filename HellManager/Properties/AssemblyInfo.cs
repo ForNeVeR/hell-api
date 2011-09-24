@@ -5,12 +5,12 @@ using System.Runtime.InteropServices;
 // General Information about an assembly is controlled through the following 
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("HellOptions")]
+[assembly: AssemblyTitle("HellManager")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("")]
-[assembly: AssemblyProduct("HellOptions")]
-[assembly: AssemblyCopyright("Copyright ©  2011")]
+[assembly: AssemblyCompany("ForNeVeR")]
+[assembly: AssemblyProduct("Hell")]
+[assembly: AssemblyCopyright("Copyright (C) 2010-2011 by ForNeVeR")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 

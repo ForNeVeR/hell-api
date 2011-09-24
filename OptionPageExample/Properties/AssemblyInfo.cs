@@ -8,9 +8,9 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyTitle("OptionPageExample")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("Microsoft")]
-[assembly: AssemblyProduct("OptionPageExample")]
-[assembly: AssemblyCopyright("Copyright © Microsoft 2011")]
+[assembly: AssemblyCompany("ForNeVeR")]
+[assembly: AssemblyProduct("Hell")]
+[assembly: AssemblyCopyright("Copyright (C) 2010-2011 by ForNeVeR")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 
