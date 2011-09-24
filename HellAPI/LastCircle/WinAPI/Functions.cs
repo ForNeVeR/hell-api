@@ -21,9 +21,6 @@
  */
 
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Runtime.InteropServices;
 
 namespace Hell.LastCircle.WinAPI
@@ -31,7 +28,7 @@ namespace Hell.LastCircle.WinAPI
     /// <summary>
     /// Various useful WinAPI functions.
     /// </summary>
-    public class Functions
+    public static class Functions
     {
         [DllImport("user32.dll", ExactSpelling = true, CharSet = CharSet.Auto)]
         public static extern IntPtr GetParent(IntPtr hWnd);

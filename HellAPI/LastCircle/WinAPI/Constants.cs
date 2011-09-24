@@ -20,11 +20,6 @@
  * THE SOFTWARE.
  */
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-
 namespace Hell.LastCircle.WinAPI
 {
     /// <summary>
@@ -52,7 +47,7 @@ namespace Hell.LastCircle.WinAPI
             }
         }
 
-        private static uint WM_USER = 0x400;
-        public static uint PSM_CHANGED = WM_USER + 104;
+        private const uint WM_USER = 0x400;
+        public const uint PSM_CHANGED = WM_USER + 104;
     }
 }

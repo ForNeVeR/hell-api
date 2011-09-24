@@ -26,7 +26,7 @@ using System.Runtime.InteropServices;
 namespace Hell.LastCircle.WinAPI
 {
     /// <summary>
-    /// NMHDR WinAPI class.
+    /// NMHDR WinAPI structure.
     /// </summary>
     [StructLayout(LayoutKind.Sequential)]
     public class NMHDR
