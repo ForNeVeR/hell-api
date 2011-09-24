@@ -14,5 +14,8 @@
 Debug
 Release
 
+# Deploy directory
+Deploy
+
 # Tool-generated files and directories
 _ReSharper.Hell
