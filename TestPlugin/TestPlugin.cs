@@ -53,10 +53,6 @@ namespace Hell
         /// <summary>
         /// Load method will be called on plugin load.
         /// </summary>
-        /// <param name="pluginLink">
-        /// Provided PluginLink object contains pointers to Miranda service
-        /// functions.
-        /// </param>
         protected override void Load()
         {
             PluginLink.CreateServiceFunction("TestPlug/MenuCommand",
