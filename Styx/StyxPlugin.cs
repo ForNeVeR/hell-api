@@ -21,6 +21,7 @@
  */
 
 using Hell;
+using Hell.FirstCircle;
 
 namespace Styx
 {
@@ -31,13 +32,19 @@ namespace Styx
     [MirandaPlugin]
     public class StyxPlugin : Plugin
     {
+        private ContactListMenuItem _menuItem;
+        
         /// <summary>
         /// This method will be called by adapter system when all preparations
         /// for plugin loading done.
         /// </summary>
         protected override void Load()
         {
-            
+            _menuItem = new ContactListMenuItem(PluginLink, "Hell.Styx/SyncHistoryCommand", "Synchronize history...", 
+                () =>
+                {
+                    // TODO: Show sync window.
+                });
         }
 
         /// <summary>
@@ -46,7 +53,7 @@ namespace Styx
         /// </summary>
         public override void Unload()
         {
-            
+            _menuItem.Dispose();
         }
     }
 }
