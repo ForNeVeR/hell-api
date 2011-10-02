@@ -43,7 +43,8 @@ namespace Styx
             _menuItem = new ContactListMenuItem(PluginLink, "Hell.Styx/SyncHistoryCommand", "Synchronize history...", 
                 () =>
                 {
-                    // TODO: Show sync window.
+                    var window = new ControlWindow();
+                    window.Show();
                 });
         }
 
