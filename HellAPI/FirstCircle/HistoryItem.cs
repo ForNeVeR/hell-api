@@ -207,29 +207,28 @@ namespace Hell.FirstCircle
         /// Creates instance of history item and loads its content from
         /// database.
         /// </summary>
-        /// <param name="pluginLink">
-        /// Object containing Miranda services.
-        /// </param>
         /// <param name="contact">
         /// Contact with whom history this item is associated.
         /// </param>
         /// <param name="hEvent">
         /// Miranda event handle.
         /// </param>
-        internal static HistoryItem Load(PluginLink pluginLink, Contact contact,
+        internal static HistoryItem Load(Contact contact,
             IntPtr hEvent)
         {
             if (hEvent == IntPtr.Zero)
                 throw new ArgumentException("hEvent cannot be zero.");
 
             // Miranda interface for freeing strings:
-            var mmi = MMInterface.GetMMI(pluginLink);
+            var mmi = MMInterface.GetMMI();
 
             using (var pDbEventInfo = new AutoPtr(Marshal.AllocHGlobal(
                 Marshal.SizeOf(typeof(DBEventInfo)))))
             {
-                var result = pluginLink.CallService("DB/Event/Get", hEvent,
-                                                    pDbEventInfo);
+                var result = Plugin.m_CallService(
+                    "DB/Event/Get",
+                    hEvent,
+                    pDbEventInfo);
                 if (result != IntPtr.Zero)
                     throw new DatabaseException();
 
@@ -255,8 +254,10 @@ namespace Hell.FirstCircle
 
                         Marshal.StructureToPtr(getText, pDbEventGetText, false);
 
-                        var pString = pluginLink.CallService("DB/Event/GetText",
-                            IntPtr.Zero, pDbEventGetText);
+                        var pString = Plugin.m_CallService(
+                            "DB/Event/GetText",
+                            IntPtr.Zero,
+                            pDbEventGetText);
                         mmi.mmi_free(pString);
 
                         var message = Marshal.PtrToStringUni(pString);
@@ -275,10 +276,7 @@ namespace Hell.FirstCircle
         /// <summary>
         /// Saves this history item to database for selected contact.
         /// </summary>
-         /// <param name="pluginLink">
-        /// Object containing Miranda services.
-        /// </param>
-        public void Save(PluginLink pluginLink)
+        public void Save()
         {
             var eventInfo = new DBEventInfo();
             eventInfo.eventType = (ushort) Type;
@@ -301,8 +299,10 @@ namespace Hell.FirstCircle
                 }
 
                 Marshal.StructureToPtr(eventInfo, pDbEventInfo, false);
-                pluginLink.CallService("DB/Event/Add", Contact.hContact,
-                                       pDbEventInfo);
+                Plugin.m_CallService(
+                    "DB/Event/Add",
+                    Contact.hContact,
+                    pDbEventInfo);
             }
         }
     }

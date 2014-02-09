@@ -44,15 +44,14 @@ namespace Hell.FirstCircle
         /// <summary>
         /// Creates a service named <paramref name="serviceName"/> and creates an item in Miranda IM contact list.
         /// </summary>
-        /// <param name="pluginLink">An object containing links to Miranda service functions.</param>
         /// <param name="serviceName">Unique name of service to be created.</param>
         /// <param name="menuItemText">Text of menu item.</param>
         /// <param name="action">Method to be called when user selects menu item.</param>
-        public ContactListMenuItem(PluginLink pluginLink, string serviceName, string menuItemText, Action action)
+        public ContactListMenuItem(string serviceName, string menuItemText, Action action)
         {
             _action = action;
             _service = Service;
-            pluginLink.CreateServiceFunction(serviceName, _service);
+            Plugin.m_CreateServiceFunction(serviceName, _service);
 
             var cListMenuItem = new CListMenuItem
                 {
@@ -65,7 +64,7 @@ namespace Hell.FirstCircle
             using (var pCListMenuItem = new AutoPtr(Marshal.AllocHGlobal(Marshal.SizeOf(typeof(CListMenuItem)))))
             {
                 Marshal.StructureToPtr(cListMenuItem, pCListMenuItem, false);
-                pluginLink.CallService("CList/AddMainMenuItem", IntPtr.Zero, pCListMenuItem);
+                Plugin.m_CallService("CList/AddMainMenuItem", IntPtr.Zero, pCListMenuItem);
             }
         }
 

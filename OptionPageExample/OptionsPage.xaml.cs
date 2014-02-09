@@ -40,17 +40,14 @@ namespace Hell
         /// Object constructor: creates page, shows it in Miranda options
         /// dialog.
         /// </summary>
-        /// <param name="pluginLink">
-        /// Reference to object containing various Miranda service functions.
-        /// </param>
         /// <param name="hInstance">
         /// Handle of DLL instance.
         /// </param>
-        public OptionsPage(PluginLink pluginLink, IntPtr hInstance)
+        public OptionsPage(IntPtr hInstance)
         {
             InitializeComponent();
 
-            page = new OptionsPageInterface(pluginLink, hInstance, "Example",
+            page = new OptionsPageInterface(hInstance, "Example",
                 "WPF Page", "Hell.OptionPlugin", this);
         }
 

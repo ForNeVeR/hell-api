@@ -40,7 +40,7 @@ namespace Styx
         /// </summary>
         protected override void Load()
         {
-            _menuItem = new ContactListMenuItem(PluginLink, "Hell.Styx/SyncHistoryCommand", "Synchronize history...", 
+            _menuItem = new ContactListMenuItem("Hell.Styx/SyncHistoryCommand", "Synchronize history...", 
                 () =>
                 {
                     var window = new ControlWindow();

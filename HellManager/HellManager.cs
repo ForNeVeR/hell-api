@@ -70,22 +70,6 @@ namespace Hell
         }
 
         /// <summary>
-        /// This method will be called by adapter.
-        /// </summary>
-        /// <param name="hInstance">
-        /// Handle of DLL instance.
-        /// </param>
-        /// <param name="pPluginLink">
-        /// Pointer to structure containing various Miranda service functions.
-        /// </param>
-        public void Load(IntPtr hInstance, IntPtr pPluginLink)
-        {
-            var pluginLink = Marshal.PtrToStructure(pPluginLink,
-                typeof(PluginLink)) as PluginLink;
-            Load(hInstance, pluginLink);            
-        }
-
-        /// <summary>
         /// Load method will be called after finishing all preparations for
         /// loading.
         /// </summary>
@@ -93,7 +77,7 @@ namespace Hell
         {
             LoadedTypes = new List<Type>();
 
-            Database = new DatabaseConnector(PluginLink);
+            Database = new DatabaseConnector();
 
             string[] settings = Database.EnumSettings("HellAdapter");
             // Call new List<Type> here for making copy of list, because list
@@ -108,7 +92,7 @@ namespace Hell
                 }
             }
 
-            options = new OptionsPage(HInstance, PluginLink, this);
+            options = new OptionsPage(HInstance, this);
         }
 
         /// <summary>
@@ -138,7 +122,7 @@ namespace Hell
         {
             var plugin = pluginType.GetConstructor(new Type[0]).Invoke(
                 new object[0]) as Plugin;
-            plugin.Load(HInstance, PluginLink);
+            plugin.Load(HInstance);
 
             loadedPlugins.Add(plugin);
             if (UnloadedTypes.Contains(pluginType))

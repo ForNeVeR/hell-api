@@ -145,7 +145,6 @@
     <Compile Include="LastCircle\WinAPI\NMHDR.cs" />
     <Compile Include="Plugin.cs" />
     <Compile Include="MirandaPluginAttribute.cs" />
-    <Compile Include="PluginLink.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Delegates.cs" />
   </ItemGroup>
