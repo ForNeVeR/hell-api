@@ -34,13 +34,10 @@ namespace Hell.LastCircle.System
         /// <summary>
         /// Method for obtaining all these function pointers.
         /// </summary>
-        /// <param name="pluginLink">
-        /// Reference to valid PluginLink object.
-        /// </param>
         /// <returns>
         /// Valid managed MMInterface object.
         /// </returns>
-        public static MMInterface GetMMI(PluginLink pluginLink)
+        public static MMInterface GetMMI()
         {
             var mmi = new MMInterface();
             
@@ -49,7 +46,9 @@ namespace Hell.LastCircle.System
                 Marshal.AllocHGlobal(Marshal.SizeOf(typeof(MMInterface)));
             Marshal.StructureToPtr(mmi, pMMInterface, false);
 
-            pluginLink.CallService("Miranda/System/GetMMI", IntPtr.Zero,
+            Plugin.m_CallService(
+                "Miranda/System/GetMMI",
+                IntPtr.Zero,
                 pMMInterface);
             
             // Get structure back from unmanaged memory:

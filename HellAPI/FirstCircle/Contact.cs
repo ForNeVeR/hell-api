@@ -60,16 +60,20 @@ namespace Hell.FirstCircle
         /// <summary>
         /// Returns full list of contacts stored in the database.
         /// </summary>
-        public static IEnumerable<Contact> Enumerate(PluginLink pluginLink)
+        public static IEnumerable<Contact> Enumerate()
         {
             var result = new List<Contact>();
-            IntPtr hContact = pluginLink.CallService("DB/Contact/FindFirst",
-                IntPtr.Zero, IntPtr.Zero);
+            IntPtr hContact = Plugin.m_CallService(
+                "DB/Contact/FindFirst",
+                IntPtr.Zero,
+                IntPtr.Zero);
             while (hContact != IntPtr.Zero)
             {
-                result.Add(new Contact(hContact, pluginLink));
-                hContact = pluginLink.CallService("DB/Contact/FindNext",
-                    hContact, IntPtr.Zero);
+                result.Add(new Contact(hContact));
+                hContact = Plugin.m_CallService(
+                    "DB/Contact/FindNext",
+                    hContact,
+                    IntPtr.Zero);
             }
 
             return result;
@@ -80,7 +84,6 @@ namespace Hell.FirstCircle
         #region Data fields and properties
 
         internal IntPtr hContact;
-        private PluginLink pluginLink;
         private MirandaHook contactSettingChangedHook;
         private IntPtr hContactSettingChangedHook;
 
@@ -111,8 +114,9 @@ namespace Hell.FirstCircle
                 {
                     Marshal.StructureToPtr(info, pContactInfo, false);
 
-                    IntPtr result = pluginLink.CallService(
-                        "Miranda/Contact/GetContactInfo", IntPtr.Zero,
+                    IntPtr result = Plugin.m_CallService(
+                        "Miranda/Contact/GetContactInfo",
+                        IntPtr.Zero,
                         pContactInfo);
 
                     info = (ContactInfo)Marshal.PtrToStructure(pContactInfo,
@@ -147,8 +151,8 @@ namespace Hell.FirstCircle
         {
             if (ReferenceEquals(null, other)) return false;
             if (ReferenceEquals(this, other)) return true;
-            return other.hContact.Equals(hContact) &&
-                   Equals(other.pluginLink, pluginLink);
+            return other.hContact.Equals(hContact);// &&
+                   //Equals(other.pluginLink, pluginLink);
         }
 
         /// <summary>
@@ -181,14 +185,13 @@ namespace Hell.FirstCircle
         /// <param name="hContact">
         /// Handle used for various Miranda contact manipulations.
         /// </param>
-        public Contact(IntPtr hContact, PluginLink pluginLink)
+        public Contact(IntPtr hContact)
         {
             this.hContact = hContact;
-            this.pluginLink = pluginLink;
 
             contactSettingChangedHook = ContactSettingChanged;
-            hContactSettingChangedHook =
-                pluginLink.HookEvent("DB/Contact/SettingChanged",
+            hContactSettingChangedHook = Plugin.m_HookEvent(
+                "DB/Contact/SettingChanged",
                 contactSettingChangedHook);
         }
 
@@ -217,9 +220,8 @@ namespace Hell.FirstCircle
 
                 Marshal.StructureToPtr(eventInfo, pDBEventInfo, false);
 
-                pluginLink.CallService("DB/Event/Add", hContact, pDBEventInfo);
-                pluginLink.CallContactService(hContact, "/SendMsg", IntPtr.Zero,
-                    pString);
+                Plugin.m_CallService("DB/Event/Add", hContact, pDBEventInfo);
+                Plugin.m_CallContactService(hContact, "/SendMsg", IntPtr.Zero, pString);
             }
         }
 
@@ -231,13 +233,13 @@ namespace Hell.FirstCircle
         /// </returns>
         public IEnumerable<HistoryItem> GetHistory()
         {
-            var hEvent = pluginLink.CallService("DB/Event/FindFirst", hContact,
+            var hEvent = Plugin.m_CallService("DB/Event/FindFirst", hContact,
                                                 IntPtr.Zero);
             while (hEvent != IntPtr.Zero)
             {
-                var item = HistoryItem.Load(pluginLink, this, hEvent);
+                var item = HistoryItem.Load(this, hEvent);
                 yield return item;
-                hEvent = pluginLink.CallService("DB/Event/FindNext", hEvent,
+                hEvent = Plugin.m_CallService("DB/Event/FindNext", hEvent,
                                                 IntPtr.Zero);
             }
             yield break;
@@ -267,9 +269,9 @@ namespace Hell.FirstCircle
                 // Copy ContactInfo to unmanaged memory:
                 Marshal.StructureToPtr(info, pContactInfo, false);
 
-                var result =
-                    pluginLink.CallService("Miranda/Contact/GetContactInfo",
-                                           IntPtr.Zero, pContactInfo);
+                var result = Plugin.m_CallService(
+                    "Miranda/Contact/GetContactInfo",
+                    IntPtr.Zero, pContactInfo);
 
                 if (result == IntPtr.Zero)
                 {
@@ -315,7 +317,7 @@ namespace Hell.FirstCircle
         public void Dispose()
         {
             disposed = true;
-            pluginLink.UnhookEvent(hContactSettingChangedHook);
+            Plugin.m_UnhookEvent(hContactSettingChangedHook);
         }
 
         ~Contact()

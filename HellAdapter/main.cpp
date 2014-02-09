@@ -23,43 +23,43 @@
 /*
  * Main HellAPI plugin controller.
  */
-#include <Windows.h>
 
-#include <newpluginapi.h>
+#pragma unmanaged
 
-#include "constants.h"
+#include "common.h"
+
+HINSTANCE hInstance;
+int hLangpack;
+
+/* Main plugin info. */
+PLUGININFOEX pluginInfo =
+{
+	sizeof(PLUGININFOEX),
+	__PLUGIN_NAME,
+	PLUGIN_MAKE_VERSION(__MAJOR_VERSION, __MINOR_VERSION, __RELEASE_NUM, __BUILD_NUM),
+	__DESCRIPTION,
+	__AUTHOR,
+	__AUTHOREMAIL,
+	__COPYRIGHT,
+	__AUTHORWEB,
+	UNICODE_AWARE,
+    // {3E83A62E-8C17-4810-9872-EB4577802F98}
+    { 0x3e83a62e, 0x8c17, 0x4810, { 0x98, 0x72, 0xeb, 0x45, 0x77, 0x80, 0x2f, 0x98 } }
+};
+
+BOOL WINAPI DllMain(HINSTANCE instance, DWORD, LPVOID)
+{
+    hInstance = instance;
+    return TRUE;
+}
+
+#pragma managed
 
 using namespace System;
 using namespace System::Collections::Generic;
 using namespace System::IO;
 using namespace System::Reflection;
 using namespace Hell;
-
-#define MIRANDA_EXPORT extern "C" __declspec(dllexport)
-
-/* Main plugin info. */
-PLUGININFOEX pluginInfo =
-{
-    sizeof(PLUGININFOEX),
-    "Hell plugin controller",
-    PLUGIN_MAKE_VERSION(0,0,1,0),
-    "Plugin that controls managed .NET plugins.",
-    "ForNeVeR",
-    "neverthness@gmail.com",
-    "Copyright 2010-2011 ForNeVeR",
-    "http://fornever.no-ip.org/",
-    UNICODE_AWARE,
-    0,
-    // {3E83A62E-8C17-4810-9872-EB4577802F98}
-    { 0x3e83a62e, 0x8c17, 0x4810,
-        { 0x98, 0x72, 0xeb, 0x45, 0x77, 0x80, 0x2f, 0x98 } }
-};
-
-/* Plugin interfaces list. */
-static MUUID interfaces[] = { MIID_TESTPLUGIN, MIID_LAST };
-
-/* Pointer to library instance. */
-HINSTANCE hInstance;
 
 namespace Hell
 {
@@ -70,16 +70,6 @@ namespace Hell
         static Plugin ^ManagerPlugin;
     };
 }
-
-#pragma unmanaged
-
-BOOL WINAPI DllMain(HINSTANCE instance, DWORD, LPVOID)
-{
-    hInstance = instance;
-    return TRUE;
-}
-
-#pragma managed
 
 /* This function loads plugin manager assembly and creates manager instance. */
 void GetManager()
@@ -139,19 +129,13 @@ MIRANDA_EXPORT PLUGININFOEX *MirandaPluginInfoEx(DWORD mirandaVersion)
     return &pluginInfo;
 }
 
-/* A function that returns interfaces list. */
-MIRANDA_EXPORT const MUUID *MirandaPluginInterfaces()
-{
-    return interfaces;
-}
 
 /* A function called on plugin load. */
-MIRANDA_EXPORT int Load(PLUGINLINK *pluginLink)
+MIRANDA_EXPORT int Load()
 {
     // Load manager plugin:
-    array<Object ^> ^args = gcnew array<Object ^>(2);
+    array<Object ^> ^args = gcnew array<Object ^>(1);
     args[0] = gcnew IntPtr(hInstance);
-    args[1] = gcnew IntPtr(pluginLink);
 
     PluginCollection::ManagerPlugin->GetType()->InvokeMember("Load",
         BindingFlags::InvokeMethod, nullptr, PluginCollection::ManagerPlugin,

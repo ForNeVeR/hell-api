@@ -55,7 +55,7 @@ namespace Hell
         /// </summary>
         protected override void Load()
         {
-            PluginLink.CreateServiceFunction("TestPlug/MenuCommand",
+            this.CreateServiceFunction("TestPlug/MenuCommand",
                 menuCommand);
 
             var mi = new CListMenuItem();
@@ -72,7 +72,7 @@ namespace Hell
                 Marshal.AllocHGlobal(Marshal.SizeOf(typeof(CListMenuItem)))))
             {
                 Marshal.StructureToPtr(mi, pClistMenuItem, false);
-                PluginLink.CallService("CList/AddMainMenuItem", IntPtr.Zero,
+                this.CallService("CList/AddMainMenuItem", IntPtr.Zero,
                     pClistMenuItem);
             }
         }

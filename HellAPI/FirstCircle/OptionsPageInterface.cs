@@ -78,11 +78,6 @@ namespace Hell.FirstCircle
         private HwndSource hwndSource;
 
         /// <summary>
-        /// Reference to object containing various Miranda service functions.
-        /// </summary>
-        private PluginLink pluginLink;
-
-        /// <summary>
         /// Handle of DLL instance. Used to gather resources from it.
         /// </summary>
         private IntPtr hInstance;
@@ -116,9 +111,6 @@ namespace Hell.FirstCircle
         /// <summary>
         /// Creates object, hooks all needed Miranda events.
         /// </summary>
-        /// <param name="pluginLink">
-        /// Reference to object containing various Miranda service functions.
-        /// </param>
         /// <param name="hInstance">
         /// Handle of DLL instance. Used to gather resources from it.
         /// </param>
@@ -136,11 +128,9 @@ namespace Hell.FirstCircle
         /// Visual object representing the content to be placed into options
         /// page.
         /// </param>
-        public OptionsPageInterface(PluginLink pluginLink, IntPtr hInstance,
-            string groupName, string pageName, string uniquePageID,
-            Visual content)
+        public OptionsPageInterface(IntPtr hInstance, string groupName,
+            string pageName, string uniquePageID, Visual content)
         {
-            this.pluginLink = pluginLink;
             this.hInstance = hInstance;
             this.groupName = groupName;
             this.pageName = pageName;
@@ -153,7 +143,7 @@ namespace Hell.FirstCircle
             
             // Hook options dialog initialise event:
             hOptInitialise = 
-                pluginLink.HookEvent("Opt/Initialise", optInitialise);
+                Plugin.m_HookEvent("Opt/Initialise", optInitialise);
         }
 
         /// <summary>
@@ -185,7 +175,7 @@ namespace Hell.FirstCircle
                 optionPage.pfnDlgProc = dlgProc;
 
                 Marshal.StructureToPtr(optionPage, pOptionPage, false);
-                pluginLink.CallService("Opt/AddPage", addInfo, pOptionPage);
+                Plugin.m_CallService("Opt/AddPage", addInfo, pOptionPage);
             }
 
             return 0;
@@ -270,7 +260,7 @@ namespace Hell.FirstCircle
         /// </summary>
         public void Dispose()
         {
-            pluginLink.UnhookEvent(hOptInitialise);
+            Plugin.m_UnhookEvent(hOptInitialise);
             
             // TODO: Remember hwndSource in static collection and remove it
             // only when options dialog is closed.

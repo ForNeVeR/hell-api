@@ -49,17 +49,13 @@ namespace Hell
         /// <param name="hInstance">
         /// Handle of DLL instance.
         /// </param>
-        /// <param name="pluginLink">
-        /// Reference to object containing various Miranda service functions.
-        /// </param>
-        public OptionsPage(IntPtr hInstance, PluginLink pluginLink,
-            HellManager manager)
+        public OptionsPage(IntPtr hInstance, HellManager manager)
         {
             InitializeComponent();
 
             this.manager = manager;
 
-            pageInterface = new OptionsPageInterface(pluginLink, hInstance,
+            pageInterface = new OptionsPageInterface(hInstance,
                 "Plugins", "Managed Plugins", "Hell.HellManager", this);
 
             pageInterface.PageShowed += (_) =>

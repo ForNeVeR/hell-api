@@ -33,20 +33,9 @@ namespace Hell.FirstCircle
     public class DatabaseConnector
     {
         /// <summary>
-        /// Reference to object containing various Miranda service functions.
-        /// </summary>
-        private PluginLink pluginLink;
-
-        /// <summary>
         /// Object constructor.
         /// </summary>
-        /// <param name="pluginLink">
-        /// Reference to object containing various Miranda service functions.
-        /// </param>
-        public DatabaseConnector(PluginLink pluginLink)
-        {
-            this.pluginLink = pluginLink;
-        }
+        public DatabaseConnector() { }
 
         /// <summary>
         /// Returns setting from database. Setting can be: byte, short, int,
@@ -159,8 +148,10 @@ namespace Hell.FirstCircle
                 Marshal.StructureToPtr(getSetting, pDBContactGetSetting,
                     false);
 
-                IntPtr result = pluginLink.CallService("DB/Contact/GetSetting",
-                    hContact, pDBContactGetSetting);
+                IntPtr result = Plugin.m_CallService(
+                    "DB/Contact/GetSetting",
+                    hContact,
+                    pDBContactGetSetting);
 
                 if (result == new IntPtr(2))
                     throw new SettingDeletedException();
@@ -281,8 +272,9 @@ namespace Hell.FirstCircle
                 Marshal.StructureToPtr(writeSetting, pDBContactWriteSetting,
                     false);
 
-                IntPtr result =
-                    pluginLink.CallService("DB/Contact/WriteSetting", hContact,
+                IntPtr result = Plugin.m_CallService(
+                    "DB/Contact/WriteSetting",
+                    hContact,
                     pDBContactWriteSetting);
 
                 // Free allocated memory:
@@ -358,7 +350,7 @@ namespace Hell.FirstCircle
 
                 Marshal.StructureToPtr(enumSettings, pDBContactEnumSettings,
                     false);
-                pluginLink.CallService("DB/Contact/EnumSettings", hContact,
+                Plugin.m_CallService("DB/Contact/EnumSettings", hContact,
                     pDBContactEnumSettings);
             }
 

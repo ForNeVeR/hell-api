@@ -62,11 +62,11 @@ namespace HellGateMM
 
         protected override void Load()
         {
-            mmi = MMInterface.GetMMI(PluginLink);
-            Database = new DatabaseConnector(PluginLink);
+            mmi = MMInterface.GetMMI();
+            Database = new DatabaseConnector();
 
-            PluginLink.HookEvent("DB/Event/Added", eventAdded);
-            PluginLink.HookEvent("CList/DoubleClicked", cListDoubleClicked);
+            this.HookEvent("DB/Event/Added", eventAdded);
+            this.HookEvent("CList/DoubleClicked", cListDoubleClicked);
         }
 
         public override void Unload()
@@ -79,7 +79,7 @@ namespace HellGateMM
             IntPtr hContact = wParam;
             IntPtr hDBEvent = lParam;
 
-            int blobSize = PluginLink.CallService("DB/Event/GetBlobSize",
+            int blobSize = this.CallService("DB/Event/GetBlobSize",
                 hDBEvent, IntPtr.Zero).ToInt32();
 
             using (var pBlob = new AutoPtr(Marshal.AllocHGlobal(blobSize)))
@@ -91,7 +91,7 @@ namespace HellGateMM
                 eventInfo.cbBlob = (uint)blobSize;
 
                 Marshal.StructureToPtr(eventInfo, pDBEventInfo, false);
-                PluginLink.CallService("DB/Event/Get", hDBEvent, pDBEventInfo);
+                this.CallService("DB/Event/Get", hDBEvent, pDBEventInfo);
 
                 eventInfo = (DBEventInfo)Marshal.PtrToStructure(pDBEventInfo,
                     typeof(DBEventInfo));
@@ -111,13 +111,13 @@ namespace HellGateMM
                         Marshal.StructureToPtr(getText, pDBEventGetText,
                             false);
 
-                        IntPtr pString = PluginLink.CallService(
+                        IntPtr pString = this.CallService(
                             "DB/Event/GetText", IntPtr.Zero, pDBEventGetText);
                         string message = Marshal.PtrToStringAnsi(pString);
 
                         mmi.mmi_free(pString);
 
-                        var contact = new Contact(hContact, PluginLink);
+                        var contact = new Contact(hContact);
 
                         DateTime eventTime = new DateTime(1970, 1, 1).
                             AddSeconds(eventInfo.timestamp).ToUniversalTime();
@@ -142,7 +142,7 @@ namespace HellGateMM
         private int CListDoubleClicked(IntPtr wParam, IntPtr lParam)
         {
             IntPtr hContact = wParam;
-            var contact = new Contact(hContact, PluginLink);
+            var contact = new Contact(hContact);
 
             if (MessagingWindow == null)
             {

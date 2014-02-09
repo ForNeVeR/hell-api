@@ -46,7 +46,7 @@ namespace Hell.Gateman
         protected override void Load()
         {
             // TODO: Handle contact creation and deletion.
-            _contacts = Contact.Enumerate(PluginLink).ToList();
+            _contacts = Contact.Enumerate().ToList();
             foreach (Contact contact in _contacts)
             {
                 contact.StatusChanged += contact_StatusChangedEvent;
