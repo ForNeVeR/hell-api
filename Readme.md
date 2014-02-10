@@ -1,56 +1,50 @@
 HellAPI
 =======
 
-What the Hell is HellAPI?
--------------------------
+HellAPI is a CLI (Mono and .NET supported) library set for writing managed .NET plugins for the Miranda NG client.
 
-HellAPI is a CLR (Mono and .NET support) library set for writing
-managed .NET plugins for Miranda IM client.
+Building
+--------
 
-Compilation
------------
+### Cloning the repository
+Don't forget to clone git submodule when cloning this repository. It can be done by adding the `--recursive` option
+when cloning or by issuing the `git submodule init` command *after* the initial cloning.
 
-Compilation process is straightforward: load a solution file
-(`Hell.sln`) in your favorite IDE (for example, Visual Studio) and
-invoke Build command.
+### Compilation
+Compilation process is straightforward: load a solution file (`Hell.sln`) in your favorite IDE (for example, Visual
+Studio 2010) and invoke the Build command.
 
 Plugin layout
 -------------
 
-For proper functioning HellAPI requires you to put following files to
-following places (relative to Miranda root directory):
+For proper functioning HellAPI requires you to put following files to following places (relative to the Miranda NG root
+directory):
 
     ./HellAPI.dll
     ./Plugins/HellAdapter.dll
     ./Plugins/Hell/HellManager.dll
 
-Any Hell-based plugins must be also placed in the `./Plugins/Hell/`
-directory.
+Any Hell-based plugins must be also placed in the `./Plugins/Hell/` directory.
 
 Writing plugins
 ---------------
 
-See project TestPlugin as a simple plugin example (this is also ported
-version of original Miranda TestPlugin from the official SDK).
+### Sample plugins
+See project TestPlugin as a simple plugin example (this is also ported version of original Miranda TestPlugin from
+the official SDK). There are also bunch of other samples inside the repository.
 
-Library levels
---------------
-
-In HellAPI, there are two namespaces: `Hell.FirstCircle` and
-`Hell.LastCircle`. Ideally, all things you use must be from
-FirstCircle; use LastCircle or direct Miranda API / Interop calls only
-as last resort.
+### Library levels
+In HellAPI, there are two namespaces: `Hell.FirstCircle` and `Hell.LastCircle`. Ideally, all things your plugin uses
+should be from `FirstCircle`; use `LastCircle` or direct Miranda API / Interop calls only as a last resort.
 
 Contact authors
 ---------------
 
-Full Miranda SDK is very big and somewhat uneasy thing to port. So
-HellAPI is nostly developed on demand. You need feature - you make
-feature (and make it available on github ;) ).
+Full Miranda SDK is very big and somewhat uneasy thing to port. So HellAPI is mostly developed on demand. If you need
+any feature you can make a feature request (or make the feature yourself).
 
-So if you need HellAPI to be extended and / or have any patches or
-suggestions, feel free to contact authors:
+Feel free to contact author:
 
     ForNeVeR
     jabber: fornever@codingteam.org.ru
-	e-mail: neverthness@gmail.com
+    e-mail: neverthness@gmail.com

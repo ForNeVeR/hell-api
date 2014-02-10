@@ -11,4 +11,4 @@
 #define __AUTHOR                 "ForNeVeR, unsane"
 #define __AUTHOREMAIL            "neverthness@gmail.com"
 #define __AUTHORWEB              "http://fornever.no-ip.org/"
-#define __COPYRIGHT              "© 2010-14 ForNeVeR"
+#define __COPYRIGHT              "© 2010-2011, F. von Never; © 2014 F. von Never, unsane"

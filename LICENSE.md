@@ -1,7 +1,7 @@
-The MIT License (MIT)
-=====================
+The MIT License
+===============
 
-Copyright (C) 2010-2011 by ForNeVeR, (C) 2014 by ForNeVeR, unsane
+Copyright (C) 2010-2011 by F. von Never, (C) 2014 by F. von Never, unsane
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
