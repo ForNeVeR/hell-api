@@ -9,6 +9,7 @@
 # Compiler-generated data directories
 */bin/
 */obj/
+/x64/
 
 # Output binary directories
 Debug
