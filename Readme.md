@@ -14,6 +14,10 @@ when cloning or by issuing the `git submodule init` command *after* the initial 
 Compilation process is straightforward: load a solution file (`Hell.sln`) in your favorite IDE (for example, Visual
 Studio 2010) and invoke the Build command.
 
+### Deployment
+There is a `Deploy.ps1` script for cleaning a `Deploy` and preparing the file layout into it. Use -X64 switch if you
+need to deploy x64 versions of the plugins.
+
 Plugin layout
 -------------
 
