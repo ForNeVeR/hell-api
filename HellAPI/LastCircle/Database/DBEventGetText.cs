@@ -1,52 +1,30 @@
-﻿/*
- * Copyright (C) 2010-2011 by ForNeVeR
- * 
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to deal
- * in the Software without restriction, including without limitation the rights
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
- * 
- * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
- * 
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
- * THE SOFTWARE.
- */
-
-using System;
+﻿using System;
 using System.Runtime.InteropServices;
 
 namespace Hell.LastCircle.Database
 {
-    /// <summary>
-    /// DBEVENTGETTEXT structure.
-    /// </summary>
-    [StructLayout(LayoutKind.Sequential)]
-    public class DBEventGetText
-    {
-        /// <summary>
-        /// egt->dbei should be the valid database event read via
-        /// MS_DB_EVENT_GET
-        /// </summary>
-	    public IntPtr dbei;
+	/// <summary>
+	/// DBEVENTGETTEXT structure.
+	/// </summary>
+	[StructLayout(LayoutKind.Sequential)]
+	public class DBEventGetText
+	{
+		/// <summary>
+		/// egt->dbei should be the valid database event read via
+		/// MS_DB_EVENT_GET
+		/// </summary>
+		public IntPtr dbei;
 
-        /// <summary>
-        /// egt->datatype = DBVT_WCHAR or DBVT_ASCIIZ or DBVT_TCHAR. If a
-        /// caller wants to suppress Unicode part of event in answer, add
-        /// DBVTF_DENYUNICODE to this field.
-        /// </summary>
-	    public int datatype;
+		/// <summary>
+		/// egt->datatype = DBVT_WCHAR or DBVT_ASCIIZ or DBVT_TCHAR. If a
+		/// caller wants to suppress Unicode part of event in answer, add
+		/// DBVTF_DENYUNICODE to this field.
+		/// </summary>
+		public int datatype;
 
-        /// <summary>
-        /// egt->codepage is any valid codepage, CP_ACP by default.
-        /// </summary>
-	    public int codepage;
-    }
+		/// <summary>
+		/// egt->codepage is any valid codepage, CP_ACP by default.
+		/// </summary>
+		public int codepage;
+	}
 }

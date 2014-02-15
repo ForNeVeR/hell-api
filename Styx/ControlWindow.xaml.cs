@@ -14,14 +14,14 @@ using System.Windows.Shapes;
 
 namespace Styx
 {
-    /// <summary>
-    /// Window for controlling Styx synchronization.
-    /// </summary>
-    public partial class ControlWindow
-    {
-        public ControlWindow()
-        {
-            InitializeComponent();
-        }
-    }
+	/// <summary>
+	/// Window for controlling Styx synchronization.
+	/// </summary>
+	public partial class ControlWindow
+	{
+		public ControlWindow()
+		{
+			InitializeComponent();
+		}
+	}
 }

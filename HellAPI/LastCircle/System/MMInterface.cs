@@ -1,26 +1,4 @@
-﻿/*
- * Copyright (C) 2010-2011 by ForNeVeR
- * 
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to deal
- * in the Software without restriction, including without limitation the rights
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
- * 
- * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
- * 
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
- * THE SOFTWARE.
- */
-
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -28,59 +6,56 @@ using System.Runtime.InteropServices;
 
 namespace Hell.LastCircle.System
 {
-    [StructLayout(LayoutKind.Sequential)]
-    public class MMInterface
-    {
-        /// <summary>
-        /// Method for obtaining all these function pointers.
-        /// </summary>
-        /// <returns>
-        /// Valid managed MMInterface object.
-        /// </returns>
-        public static MMInterface GetMMI()
-        {
-            var mmi = new MMInterface();
-            
-            // Put structure to unmanaged memory:
-            IntPtr pMMInterface =
-                Marshal.AllocHGlobal(Marshal.SizeOf(typeof(MMInterface)));
-            Marshal.StructureToPtr(mmi, pMMInterface, false);
+	[StructLayout(LayoutKind.Sequential)]
+	public class MMInterface
+	{
+		/// <summary>
+		/// Method for obtaining all these function pointers.
+		/// </summary>
+		/// <returns>
+		/// Valid managed MMInterface object.
+		/// </returns>
+		public static MMInterface GetMMI()
+		{
+			var mmi = new MMInterface();
 
-            Plugin.m_CallService(
-                "Miranda/System/GetMMI",
-                IntPtr.Zero,
-                pMMInterface);
-            
-            // Get structure back from unmanaged memory:
-            mmi = (MMInterface) Marshal.PtrToStructure(pMMInterface, 
-                typeof(MMInterface));
-            
-            // Free allocated unmanaged memory:
-            Marshal.FreeHGlobal(pMMInterface);
-            
-            return mmi;
-        }
-        
-        [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-        public delegate IntPtr MallocDelegate(UIntPtr size);
+			// Put structure to unmanaged memory:
+			IntPtr pMMInterface =
+				Marshal.AllocHGlobal(Marshal.SizeOf(typeof (MMInterface)));
+			Marshal.StructureToPtr(mmi, pMMInterface, false);
 
-        [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-        public delegate IntPtr ReallocDelegate(IntPtr ptr, UIntPtr size);
+			Plugin.m_CallService(
+				"Miranda/System/GetMMI",
+				IntPtr.Zero,
+				pMMInterface);
 
-        [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-        public delegate void FreeDelegate(IntPtr ptr);
-        
-        private UIntPtr cbSize =
-            new UIntPtr((uint)Marshal.SizeOf(typeof(MMInterface)));
+			// Get structure back from unmanaged memory:
+			mmi = (MMInterface)Marshal.PtrToStructure(pMMInterface,
+				typeof (MMInterface));
 
-        [MarshalAs(UnmanagedType.FunctionPtr)]
-        public MallocDelegate mmi_malloc;
+			// Free allocated unmanaged memory:
+			Marshal.FreeHGlobal(pMMInterface);
 
-        [MarshalAs(UnmanagedType.FunctionPtr)]
-        public ReallocDelegate mmi_realloc;
+			return mmi;
+		}
 
-        [MarshalAs(UnmanagedType.FunctionPtr)]
-        public FreeDelegate mmi_free;        
+		[UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+		public delegate IntPtr MallocDelegate(UIntPtr size);
+
+		[UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+		public delegate IntPtr ReallocDelegate(IntPtr ptr, UIntPtr size);
+
+		[UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+		public delegate void FreeDelegate(IntPtr ptr);
+
+		private UIntPtr cbSize =
+			new UIntPtr((uint)Marshal.SizeOf(typeof (MMInterface)));
+
+		[MarshalAs(UnmanagedType.FunctionPtr)] public MallocDelegate mmi_malloc;
+
+		[MarshalAs(UnmanagedType.FunctionPtr)] public ReallocDelegate mmi_realloc;
+
+		[MarshalAs(UnmanagedType.FunctionPtr)] public FreeDelegate mmi_free;
 
 /* TODO: Finish definition:
 struct MM_INTERFACE
@@ -108,5 +83,5 @@ struct MM_INTERFACE
 	#endif
 };
 */
-    }
+	}
 }

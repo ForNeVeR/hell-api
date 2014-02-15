@@ -1,79 +1,57 @@
-﻿/*
- * Copyright (C) 2011 by ForNeVeR
- * 
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to deal
- * in the Software without restriction, including without limitation the rights
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
- * 
- * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
- * 
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
- * THE SOFTWARE.
- */
-
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using Hell.FirstCircle;
 
 namespace Hell.Gateman
 {
-    /// <summary>
-    /// Plugin for logging users online time.
-    /// </summary>
-    [MirandaPluginAttribute]
-    public class Gateman : Plugin
-    {
-        private IList<Contact> _contacts;
+	/// <summary>
+	/// Plugin for logging users online time.
+	/// </summary>
+	[MirandaPluginAttribute]
+	public class Gateman : Plugin
+	{
+		private IList<Contact> _contacts;
 
-        /// <summary>
-        /// A data storage for this plugin instance.
-        /// </summary>
-        private Storage _storage;
+		/// <summary>
+		/// A data storage for this plugin instance.
+		/// </summary>
+		private Storage _storage;
 
-        /// <summary>
-        /// A method called for plugin loading.
-        /// </summary>
-        protected override void Load()
-        {
-            // TODO: Handle contact creation and deletion.
-            _contacts = Contact.Enumerate().ToList();
-            foreach (Contact contact in _contacts)
-            {
-                contact.StatusChanged += contact_StatusChangedEvent;
-            }
+		/// <summary>
+		/// A method called for plugin loading.
+		/// </summary>
+		protected override void Load()
+		{
+			// TODO: Handle contact creation and deletion.
+			_contacts = Contact.Enumerate().ToList();
+			foreach (Contact contact in _contacts)
+			{
+				contact.StatusChanged += contact_StatusChangedEvent;
+			}
 
-            // TODO: Read file name from settings.
-            _storage = new Storage("Gateman.sqlite");
-        }
+			// TODO: Read file name from settings.
+			_storage = new Storage("Gateman.sqlite");
+		}
 
-        /// <summary>
-        /// A method called when plugin engine desided to stop this plugin.
-        /// </summary>
-        public override void Unload()
-        {
-            _storage.Dispose();
-            foreach (Contact contact in _contacts)
-            {
-                contact.Dispose();
-            }
-        }
+		/// <summary>
+		/// A method called when plugin engine desided to stop this plugin.
+		/// </summary>
+		public override void Unload()
+		{
+			_storage.Dispose();
+			foreach (Contact contact in _contacts)
+			{
+				contact.Dispose();
+			}
+		}
 
-        /// <summary>
-        /// An event handler called when some contact status changed.
-        /// </summary>
-        private void contact_StatusChangedEvent(Contact sender, Contact.Status newStatus)
-        {
-            _storage.StoreStatus(sender, newStatus, DateTime.Now);
-        }
-    }
+		/// <summary>
+		/// An event handler called when some contact status changed.
+		/// </summary>
+		private void contact_StatusChangedEvent(Contact sender, Contact.Status newStatus)
+		{
+			_storage.StoreStatus(sender, newStatus, DateTime.Now);
+		}
+	}
 }

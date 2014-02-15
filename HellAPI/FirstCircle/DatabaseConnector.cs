@@ -1,363 +1,348 @@
-﻿/*
- * Copyright (C) 2010-2011 by ForNeVeR
- * 
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to deal
- * in the Software without restriction, including without limitation the rights
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
- * 
- * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
- * 
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
- * THE SOFTWARE.
- */
-
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
 using Hell.LastCircle.Database;
 
 namespace Hell.FirstCircle
 {
-    /// <summary>
-    /// Helper class for working with database.
-    /// </summary>
-    public class DatabaseConnector
-    {
-        /// <summary>
-        /// Object constructor.
-        /// </summary>
-        public DatabaseConnector() { }
+	/// <summary>
+	/// Helper class for working with database.
+	/// </summary>
+	public class DatabaseConnector
+	{
+		/// <summary>
+		/// Object constructor.
+		/// </summary>
+		public DatabaseConnector()
+		{
+		}
 
-        /// <summary>
-        /// Returns setting from database. Setting can be: byte, short, int,
-        /// string, byte[].
-        /// </summary>
-        /// <param name="moduleName">
-        /// Name of module that wrote the setting to get.
-        /// </param>
-        /// <param name="settingName">
-        /// Name of setting to get.
-        /// </param>
-        /// <returns>
-        /// Object that may be casted to one of variant types.
-        /// </returns>
-        public object GetSetting(string moduleName, string settingName)
-        {
-            return GetSetting(IntPtr.Zero, moduleName, settingName);
-        }
+		/// <summary>
+		/// Returns setting from database. Setting can be: byte, short, int,
+		/// string, byte[].
+		/// </summary>
+		/// <param name="moduleName">
+		/// Name of module that wrote the setting to get.
+		/// </param>
+		/// <param name="settingName">
+		/// Name of setting to get.
+		/// </param>
+		/// <returns>
+		/// Object that may be casted to one of variant types.
+		/// </returns>
+		public object GetSetting(string moduleName, string settingName)
+		{
+			return GetSetting(IntPtr.Zero, moduleName, settingName);
+		}
 
-        /// <summary>
-        /// Reads setting from database for specified contact. Setting can be:
-        /// byte, short, int, string, byte[].
-        /// </summary>
-        /// <param name="contact">
-        /// Reference to contact whose setting must be gotten.
-        /// </param>
-        /// <param name="moduleName">
-        /// Name of module that wrote the setting to get.
-        /// </param>
-        /// <param name="settingName">
-        /// Name of setting to get.
-        /// </param>
-        /// <returns>
-        /// Object that may be casted to one of variant types.
-        /// </returns>
-        public object GetContactSetting(Contact contact, string moduleName,
-            string settingName)
-        {
-            return GetSetting(contact.hContact, moduleName, settingName);
-        }
+		/// <summary>
+		/// Reads setting from database for specified contact. Setting can be:
+		/// byte, short, int, string, byte[].
+		/// </summary>
+		/// <param name="contact">
+		/// Reference to contact whose setting must be gotten.
+		/// </param>
+		/// <param name="moduleName">
+		/// Name of module that wrote the setting to get.
+		/// </param>
+		/// <param name="settingName">
+		/// Name of setting to get.
+		/// </param>
+		/// <returns>
+		/// Object that may be casted to one of variant types.
+		/// </returns>
+		public object GetContactSetting(Contact contact, string moduleName,
+			string settingName)
+		{
+			return GetSetting(contact.hContact, moduleName, settingName);
+		}
 
-        /// <summary>
-        /// Writes global setting to database.
-        /// </summary>
-        /// <param name="moduleName">
-        /// Name of module that wrote the setting to get.
-        /// </param>
-        /// <param name="settingName">
-        /// Name of setting to get.
-        /// <param name="value">
-        /// Value of one of specified types: byte, ushort, short, uint, int,
-        /// string, byte[].
-        /// </param>
-        public void SetSetting(string moduleName, string settingName,
-            object value)
-        {
-            SetSetting(IntPtr.Zero, moduleName, settingName, value);
-        }
+		/// <summary>
+		/// Writes global setting to database.
+		/// </summary>
+		/// <param name="moduleName">
+		/// Name of module that wrote the setting to get.
+		/// </param>
+		/// <param name="settingName">
+		/// Name of setting to get.
+		/// <param name="value">
+		/// Value of one of specified types: byte, ushort, short, uint, int,
+		/// string, byte[].
+		/// </param>
+		public void SetSetting(string moduleName, string settingName,
+			object value)
+		{
+			SetSetting(IntPtr.Zero, moduleName, settingName, value);
+		}
 
-        /// <summary>
-        /// Writes setting to database.
-        /// </summary>
-        /// <param name="Contact">
-        /// Contact whose setting must be gotten.
-        /// </param>
-        /// <param name="moduleName">
-        /// Name of module that wrote the setting to get.
-        /// </param>
-        /// <param name="settingName">
-        /// Name of setting to get.
-        /// <param name="value">
-        /// Value of one of specified types: byte, ushort, short, uint, int,
-        /// string, byte[].
-        /// </param>
-        public void SetContactSetting(Contact contact, string moduleName,
-            string settingName, object value)
-        {
-            SetSetting(contact.hContact, moduleName, settingName, value);
-        }
+		/// <summary>
+		/// Writes setting to database.
+		/// </summary>
+		/// <param name="Contact">
+		/// Contact whose setting must be gotten.
+		/// </param>
+		/// <param name="moduleName">
+		/// Name of module that wrote the setting to get.
+		/// </param>
+		/// <param name="settingName">
+		/// Name of setting to get.
+		/// <param name="value">
+		/// Value of one of specified types: byte, ushort, short, uint, int,
+		/// string, byte[].
+		/// </param>
+		public void SetContactSetting(Contact contact, string moduleName,
+			string settingName, object value)
+		{
+			SetSetting(contact.hContact, moduleName, settingName, value);
+		}
 
-        /// <summary>
-        /// Reads setting from database for specified contact. Setting can be:
-        /// byte, short, int, string, byte[].
-        /// </summary>
-        /// <param name="hContact">
-        /// Handle of contact whose setting must be gotten.
-        /// </param>
-        /// <param name="moduleName">
-        /// Name of module that wrote the setting to get.
-        /// </param>
-        /// <param name="settingName">
-        /// Name of setting to get.
-        /// </param>
-        /// <returns>
-        /// Object that may be casted to one of variant types.
-        /// </returns>
-        private object GetSetting(IntPtr hContact, string moduleName,
-            string settingName)
-        {
-            using (var pDBContactGetSetting = new AutoPtr(Marshal.AllocHGlobal(
-                Marshal.SizeOf(typeof(DBContactGetSetting)))))
-            using (var pVariant = new AutoPtr(
-                Marshal.AllocHGlobal(Marshal.SizeOf(typeof(DBVariant)))))
-            { 
-                var getSetting = new DBContactGetSetting();
-                getSetting.szModule = moduleName;
-                getSetting.szSetting = settingName;
-                getSetting.pValue = pVariant;
+		/// <summary>
+		/// Reads setting from database for specified contact. Setting can be:
+		/// byte, short, int, string, byte[].
+		/// </summary>
+		/// <param name="hContact">
+		/// Handle of contact whose setting must be gotten.
+		/// </param>
+		/// <param name="moduleName">
+		/// Name of module that wrote the setting to get.
+		/// </param>
+		/// <param name="settingName">
+		/// Name of setting to get.
+		/// </param>
+		/// <returns>
+		/// Object that may be casted to one of variant types.
+		/// </returns>
+		private object GetSetting(IntPtr hContact, string moduleName,
+			string settingName)
+		{
+			using (var pDBContactGetSetting = new AutoPtr(Marshal.AllocHGlobal(
+				Marshal.SizeOf(typeof (DBContactGetSetting)))))
+			using (var pVariant = new AutoPtr(
+				Marshal.AllocHGlobal(Marshal.SizeOf(typeof (DBVariant)))))
+			{
+				var getSetting = new DBContactGetSetting();
+				getSetting.szModule = moduleName;
+				getSetting.szSetting = settingName;
+				getSetting.pValue = pVariant;
 
-                Marshal.StructureToPtr(getSetting, pDBContactGetSetting,
-                    false);
+				Marshal.StructureToPtr(getSetting, pDBContactGetSetting,
+					false);
 
-                IntPtr result = Plugin.m_CallService(
-                    "DB/Contact/GetSetting",
-                    hContact,
-                    pDBContactGetSetting);
+				IntPtr result = Plugin.m_CallService(
+					"DB/Contact/GetSetting",
+					hContact,
+					pDBContactGetSetting);
 
-                if (result == new IntPtr(2))
-                    throw new SettingDeletedException();
-                if (result != IntPtr.Zero)
-                    throw new DatabaseException();
+				if (result == new IntPtr(2))
+					throw new SettingDeletedException();
+				if (result != IntPtr.Zero)
+					throw new DatabaseException();
 
-                var variant = Marshal.PtrToStructure(pVariant,
-                    typeof(DBVariant)) as DBVariant;
-                switch (variant.type)
-                {
-                    case DBVariant.DBVT_DELETED:
-                        throw new SettingDeletedException();
-                    case DBVariant.DBVT_BYTE:
-                        return variant.Value.bVal;
-                    case DBVariant.DBVT_WORD:
-                        return variant.Value.sVal;
-                    case DBVariant.DBVT_DWORD:
-                        return variant.Value.lVal;
-                    case DBVariant.DBVT_ASCIIZ:
-                        return Marshal.PtrToStringAnsi(variant.Value.pszVal);
-                    case DBVariant.DBVT_BLOB:
-                        int size = variant.Value.ByteArrayValue.cpbVal;
-                        IntPtr pBlob = variant.Value.ByteArrayValue.pbVal;
-                        var blob = new byte[size];
-                        for (int i = 0; i < size; ++i)
-                            blob[i] = Marshal.ReadByte(pBlob, i);
-                        return blob;
-                    case DBVariant.DBVT_UTF8:
-                        throw new NotImplementedException("UTF-8 decoding " +
-                            "still not implemented.");
-                    case DBVariant.DBVT_WCHAR:
-                        return Marshal.PtrToStringUni(variant.Value.pszVal);
-                    default:
-                        throw new DatabaseException();
-                }
-            }
-        }
+				var variant = Marshal.PtrToStructure(pVariant,
+					typeof (DBVariant)) as DBVariant;
+				switch (variant.type)
+				{
+					case DBVariant.DBVT_DELETED:
+						throw new SettingDeletedException();
+					case DBVariant.DBVT_BYTE:
+						return variant.Value.bVal;
+					case DBVariant.DBVT_WORD:
+						return variant.Value.sVal;
+					case DBVariant.DBVT_DWORD:
+						return variant.Value.lVal;
+					case DBVariant.DBVT_ASCIIZ:
+						return Marshal.PtrToStringAnsi(variant.Value.pszVal);
+					case DBVariant.DBVT_BLOB:
+						int size = variant.Value.ByteArrayValue.cpbVal;
+						IntPtr pBlob = variant.Value.ByteArrayValue.pbVal;
+						var blob = new byte[size];
+						for (int i = 0; i < size; ++i)
+							blob[i] = Marshal.ReadByte(pBlob, i);
+						return blob;
+					case DBVariant.DBVT_UTF8:
+						throw new NotImplementedException("UTF-8 decoding " +
+						                                  "still not implemented.");
+					case DBVariant.DBVT_WCHAR:
+						return Marshal.PtrToStringUni(variant.Value.pszVal);
+					default:
+						throw new DatabaseException();
+				}
+			}
+		}
 
-        /// <summary>
-        /// Writes setting to database.
-        /// </summary>
-        /// <param name="hContact">
-        /// Handle of contact whose setting must be gotten.
-        /// </param>
-        /// <param name="moduleName">
-        /// Name of module that wrote the setting to get.
-        /// </param>
-        /// <param name="settingName">
-        /// Name of setting to get.
-        /// <param name="value">
-        /// Value of one of specified types: byte, ushort, short, uint, int,
-        /// string, byte[].
-        /// </param>
-        private void SetSetting(IntPtr hContact, string moduleName,
-            string settingName, object value)
-        {
-            using(var pDBContactWriteSetting =
-                new AutoPtr(Marshal.AllocHGlobal(
-                    Marshal.SizeOf(typeof(DBContactWriteSetting)))))
-            {
-                var writeSetting = new DBContactWriteSetting();
-                writeSetting.szModule = moduleName;
-                writeSetting.szSetting = settingName;
+		/// <summary>
+		/// Writes setting to database.
+		/// </summary>
+		/// <param name="hContact">
+		/// Handle of contact whose setting must be gotten.
+		/// </param>
+		/// <param name="moduleName">
+		/// Name of module that wrote the setting to get.
+		/// </param>
+		/// <param name="settingName">
+		/// Name of setting to get.
+		/// <param name="value">
+		/// Value of one of specified types: byte, ushort, short, uint, int,
+		/// string, byte[].
+		/// </param>
+		private void SetSetting(IntPtr hContact, string moduleName,
+			string settingName, object value)
+		{
+			using (var pDBContactWriteSetting =
+				new AutoPtr(Marshal.AllocHGlobal(
+					Marshal.SizeOf(typeof (DBContactWriteSetting)))))
+			{
+				var writeSetting = new DBContactWriteSetting();
+				writeSetting.szModule = moduleName;
+				writeSetting.szSetting = settingName;
 
-                var variant = new DBVariant();
+				var variant = new DBVariant();
 
-                // This pointer will be set if we allocate unmanaged memory to
-                // store the value:
-                AutoPtr valuePtr = null;
-                if (value is byte)
-                {
-                    variant.type = DBVariant.DBVT_BYTE;
-                    variant.Value.bVal = (byte)value;
-                }
-                else if (value is ushort)
-                {
-                    variant.type = DBVariant.DBVT_WORD;
-                    variant.Value.wVal = (ushort)value;
-                }
-                else if (value is short)
-                {
-                    variant.type = DBVariant.DBVT_WORD;
-                    variant.Value.sVal = (short)value;
-                }
-                else if (value is uint)
-                {
-                    variant.type = DBVariant.DBVT_DWORD;
-                    variant.Value.dVal = (uint)value;
-                }
-                else if (value is int)
-                {
-                    variant.type = DBVariant.DBVT_DWORD;
-                    variant.Value.lVal = (int)value;
-                }
-                else if (value is string)
-                {
-                    variant.type = DBVariant.DBVT_WCHAR;
-                    valuePtr = new AutoPtr(
-                        Marshal.StringToHGlobalUni(value as string));
-                    variant.Value.pszVal = valuePtr;
-                }
-                else if (value is byte[])
-                {
-                    var blob = value as byte[];
-                    valuePtr = new AutoPtr(Marshal.AllocHGlobal(blob.Length));
-                    for (int i = 0; i < blob.Length; ++i)
-                        Marshal.WriteByte(valuePtr, i, blob[i]);
+				// This pointer will be set if we allocate unmanaged memory to
+				// store the value:
+				AutoPtr valuePtr = null;
+				if (value is byte)
+				{
+					variant.type = DBVariant.DBVT_BYTE;
+					variant.Value.bVal = (byte)value;
+				}
+				else if (value is ushort)
+				{
+					variant.type = DBVariant.DBVT_WORD;
+					variant.Value.wVal = (ushort)value;
+				}
+				else if (value is short)
+				{
+					variant.type = DBVariant.DBVT_WORD;
+					variant.Value.sVal = (short)value;
+				}
+				else if (value is uint)
+				{
+					variant.type = DBVariant.DBVT_DWORD;
+					variant.Value.dVal = (uint)value;
+				}
+				else if (value is int)
+				{
+					variant.type = DBVariant.DBVT_DWORD;
+					variant.Value.lVal = (int)value;
+				}
+				else if (value is string)
+				{
+					variant.type = DBVariant.DBVT_WCHAR;
+					valuePtr = new AutoPtr(
+						Marshal.StringToHGlobalUni(value as string));
+					variant.Value.pszVal = valuePtr;
+				}
+				else if (value is byte[])
+				{
+					var blob = value as byte[];
+					valuePtr = new AutoPtr(Marshal.AllocHGlobal(blob.Length));
+					for (int i = 0; i < blob.Length; ++i)
+						Marshal.WriteByte(valuePtr, i, blob[i]);
 
-                    variant.Value.ByteArrayValue.cpbVal = (ushort)blob.Length;
-                    variant.Value.ByteArrayValue.pbVal = valuePtr;
-                }
-                else
-                    throw new ArgumentException("Type of argument not " +
-                        "supported.", "value");
+					variant.Value.ByteArrayValue.cpbVal = (ushort)blob.Length;
+					variant.Value.ByteArrayValue.pbVal = valuePtr;
+				}
+				else
+					throw new ArgumentException("Type of argument not " +
+					                            "supported.", "value");
 
-                writeSetting.value = variant;
+				writeSetting.value = variant;
 
-                Marshal.StructureToPtr(writeSetting, pDBContactWriteSetting,
-                    false);
+				Marshal.StructureToPtr(writeSetting, pDBContactWriteSetting,
+					false);
 
-                IntPtr result = Plugin.m_CallService(
-                    "DB/Contact/WriteSetting",
-                    hContact,
-                    pDBContactWriteSetting);
+				IntPtr result = Plugin.m_CallService(
+					"DB/Contact/WriteSetting",
+					hContact,
+					pDBContactWriteSetting);
 
-                // Free allocated memory:
-                if (valuePtr != null)
-                    valuePtr.Dispose();
-                
-                if (result != IntPtr.Zero)
-                    throw new DatabaseException();
-            }
-        }
+				// Free allocated memory:
+				if (valuePtr != null)
+					valuePtr.Dispose();
 
-        /// <summary>
-        /// Reads all setting names from database ofspecified module.
-        /// </summary>
-        /// <param name="moduleName">
-        /// Name of module that wrote the settings to get.
-        /// </param>
-        /// <returns>
-        /// Array with setting names.
-        /// </returns>
-        public string[] EnumSettings(string moduleName)
-        {
-            return EnumContactSettings(IntPtr.Zero, moduleName);
-        }
+				if (result != IntPtr.Zero)
+					throw new DatabaseException();
+			}
+		}
 
-        /// <summary>
-        /// Reads all setting names from database for spedified contact of
-        /// specified module.
-        /// </summary>
-        /// <param name="contact">
-        /// Contact whose settings must be gotten.
-        /// </param>
-        /// <param name="moduleName">
-        /// Name of module that wrote the settings to get.
-        /// </param>
-        /// <returns>
-        /// Array with setting names.
-        /// </returns>
-        public string[] EnumContactSettings(Contact contact, string moduleName)
-        {
-            return EnumContactSettings(contact.hContact, moduleName);
-        }
+		/// <summary>
+		/// Reads all setting names from database ofspecified module.
+		/// </summary>
+		/// <param name="moduleName">
+		/// Name of module that wrote the settings to get.
+		/// </param>
+		/// <returns>
+		/// Array with setting names.
+		/// </returns>
+		public string[] EnumSettings(string moduleName)
+		{
+			return EnumContactSettings(IntPtr.Zero, moduleName);
+		}
 
-        /// <summary>
-        /// Reads all setting names from database for spedified contact of
-        /// specified module.
-        /// </summary>
-        /// <param name="hContact">
-        /// Handle of contact whose settings must be gotten.
-        /// </param>
-        /// <param name="moduleName">
-        /// Name of module that wrote the settings to get.
-        /// </param>
-        /// <returns>
-        /// Array with setting names.
-        /// </returns>
-        private string[] EnumContactSettings(IntPtr hContact,
-            string moduleName)
-        {
-            var result = new List<string>();
+		/// <summary>
+		/// Reads all setting names from database for spedified contact of
+		/// specified module.
+		/// </summary>
+		/// <param name="contact">
+		/// Contact whose settings must be gotten.
+		/// </param>
+		/// <param name="moduleName">
+		/// Name of module that wrote the settings to get.
+		/// </param>
+		/// <returns>
+		/// Array with setting names.
+		/// </returns>
+		public string[] EnumContactSettings(Contact contact, string moduleName)
+		{
+			return EnumContactSettings(contact.hContact, moduleName);
+		}
 
-            using (var pDBContactEnumSettings =
-                new AutoPtr(Marshal.AllocHGlobal(
-                    Marshal.SizeOf(typeof(DBContactEnumSettings)))))
-            {
-                var enumSettings = new DBContactEnumSettings();
-                enumSettings.pfnEnumProc = (settingName, _) =>
-                    {
-                        result.Add(settingName);
-                        return 0;
-                    };
-                enumSettings.szModule = moduleName;
+		/// <summary>
+		/// Reads all setting names from database for spedified contact of
+		/// specified module.
+		/// </summary>
+		/// <param name="hContact">
+		/// Handle of contact whose settings must be gotten.
+		/// </param>
+		/// <param name="moduleName">
+		/// Name of module that wrote the settings to get.
+		/// </param>
+		/// <returns>
+		/// Array with setting names.
+		/// </returns>
+		private string[] EnumContactSettings(IntPtr hContact,
+			string moduleName)
+		{
+			var result = new List<string>();
 
-                Marshal.StructureToPtr(enumSettings, pDBContactEnumSettings,
-                    false);
-                Plugin.m_CallService("DB/Contact/EnumSettings", hContact,
-                    pDBContactEnumSettings);
-            }
+			using (var pDBContactEnumSettings =
+				new AutoPtr(Marshal.AllocHGlobal(
+					Marshal.SizeOf(typeof (DBContactEnumSettings)))))
+			{
+				var enumSettings = new DBContactEnumSettings();
+				enumSettings.pfnEnumProc = (settingName, _) =>
+				                           {
+					                           result.Add(settingName);
+					                           return 0;
+				                           };
+				enumSettings.szModule = moduleName;
 
-            return result.ToArray();
-        }
-    }
+				Marshal.StructureToPtr(enumSettings, pDBContactEnumSettings,
+					false);
+				Plugin.m_CallService("DB/Contact/EnumSettings", hContact,
+					pDBContactEnumSettings);
+			}
 
-    public class DatabaseException : Exception { }
-    public class SettingDeletedException : DatabaseException { }
+			return result.ToArray();
+		}
+	}
+
+	public class DatabaseException : Exception
+	{
+	}
+
+	public class SettingDeletedException : DatabaseException
+	{
+	}
 }

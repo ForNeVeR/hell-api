@@ -1,26 +1,4 @@
-﻿/*
- * Copyright (C) 2010-2011 by ForNeVeR
- * 
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to deal
- * in the Software without restriction, including without limitation the rights
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
- * 
- * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
- * 
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
- * THE SOFTWARE.
- */
-
-using System;
+﻿using System;
 using System.Runtime.InteropServices;
 using Hell.LastCircle.Contacts;
 using Hell.LastCircle.Database;
@@ -28,302 +6,302 @@ using System.Collections.Generic;
 
 namespace Hell.FirstCircle
 {
-    /// <summary>
-    /// Class representing Miranda contact.
-    /// </summary>
-    public class Contact : IDisposable
-    {
-        public enum Status
-        {
-            Offline = 40071,
-            Online = 40072,
-            Away = 40073,
-            DoNotDisturb = 40074,
-            NA = 40075,
-            Occupied = 40076,
-            FreeChat = 40077,
-            Invisible = 40078,
-            OnThePhone = 40079,
-            OutToLunch = 40080
-        }
+	/// <summary>
+	/// Class representing Miranda contact.
+	/// </summary>
+	public class Contact : IDisposable
+	{
+		public enum Status
+		{
+			Offline = 40071,
+			Online = 40072,
+			Away = 40073,
+			DoNotDisturb = 40074,
+			NA = 40075,
+			Occupied = 40076,
+			FreeChat = 40077,
+			Invisible = 40078,
+			OnThePhone = 40079,
+			OutToLunch = 40080
+		}
 
-        public delegate void StatusChangedEventHandler(Contact sender, 
-            Status newStatus);
+		public delegate void StatusChangedEventHandler(Contact sender,
+			Status newStatus);
 
-        /// <summary>
-        /// This event is raised on contact status changes.
-        /// </summary>
-        public event StatusChangedEventHandler StatusChanged;
-        
-        #region Static methods
+		/// <summary>
+		/// This event is raised on contact status changes.
+		/// </summary>
+		public event StatusChangedEventHandler StatusChanged;
 
-        /// <summary>
-        /// Returns full list of contacts stored in the database.
-        /// </summary>
-        public static IEnumerable<Contact> Enumerate()
-        {
-            var result = new List<Contact>();
-            IntPtr hContact = Plugin.m_CallService(
-                "DB/Contact/FindFirst",
-                IntPtr.Zero,
-                IntPtr.Zero);
-            while (hContact != IntPtr.Zero)
-            {
-                result.Add(new Contact(hContact));
-                hContact = Plugin.m_CallService(
-                    "DB/Contact/FindNext",
-                    hContact,
-                    IntPtr.Zero);
-            }
+		#region Static methods
 
-            return result;
-        }
+		/// <summary>
+		/// Returns full list of contacts stored in the database.
+		/// </summary>
+		public static IEnumerable<Contact> Enumerate()
+		{
+			var result = new List<Contact>();
+			IntPtr hContact = Plugin.m_CallService(
+				"DB/Contact/FindFirst",
+				IntPtr.Zero,
+				IntPtr.Zero);
+			while (hContact != IntPtr.Zero)
+			{
+				result.Add(new Contact(hContact));
+				hContact = Plugin.m_CallService(
+					"DB/Contact/FindNext",
+					hContact,
+					IntPtr.Zero);
+			}
 
-        #endregion
+			return result;
+		}
 
-        #region Data fields and properties
+		#endregion
 
-        internal IntPtr hContact;
-        private MirandaHook contactSettingChangedHook;
-        private IntPtr hContactSettingChangedHook;
+		#region Data fields and properties
 
-        private bool disposed;
+		internal IntPtr hContact;
+		private MirandaHook contactSettingChangedHook;
+		private IntPtr hContactSettingChangedHook;
 
-        /// <summary>
-        /// Nickname of contact from database.
-        /// </summary>
-        public string Nickname
-        {
-            get { return GetContactField(ContactInfo.CNF_NICK); }
-        }
+		private bool disposed;
 
-        /// <summary>
-        /// Internal protocol name of contact from database.
-        /// </summary>
-        public string Protocol
-        {
-            get
-            {
-                // Create ContactInfo object:
-                var info = new ContactInfo();
-                info.hContact = hContact;
+		/// <summary>
+		/// Nickname of contact from database.
+		/// </summary>
+		public string Nickname
+		{
+			get { return GetContactField(ContactInfo.CNF_NICK); }
+		}
 
-                // Copy ContactInfo to unmanaged memory:
-                using (var pContactInfo = new AutoPtr(
-                    Marshal.AllocHGlobal(Marshal.SizeOf(typeof(ContactInfo)))))
-                {
-                    Marshal.StructureToPtr(info, pContactInfo, false);
+		/// <summary>
+		/// Internal protocol name of contact from database.
+		/// </summary>
+		public string Protocol
+		{
+			get
+			{
+				// Create ContactInfo object:
+				var info = new ContactInfo();
+				info.hContact = hContact;
 
-                    IntPtr result = Plugin.m_CallService(
-                        "Miranda/Contact/GetContactInfo",
-                        IntPtr.Zero,
-                        pContactInfo);
+				// Copy ContactInfo to unmanaged memory:
+				using (var pContactInfo = new AutoPtr(
+					Marshal.AllocHGlobal(Marshal.SizeOf(typeof (ContactInfo)))))
+				{
+					Marshal.StructureToPtr(info, pContactInfo, false);
 
-                    info = (ContactInfo)Marshal.PtrToStructure(pContactInfo,
-                        typeof(ContactInfo));
-                }
+					IntPtr result = Plugin.m_CallService(
+						"Miranda/Contact/GetContactInfo",
+						IntPtr.Zero,
+						pContactInfo);
 
-                return info.szProto;
-            }
-        }
+					info = (ContactInfo)Marshal.PtrToStructure(pContactInfo,
+						typeof (ContactInfo));
+				}
 
-        /// <summary>
-        /// Unique user Id.
-        /// </summary>
-        public string Uid
-        {
-            get { return GetContactField(ContactInfo.CNF_UNIQUEID); }
-        }
+				return info.szProto;
+			}
+		}
 
-        #endregion
+		/// <summary>
+		/// Unique user Id.
+		/// </summary>
+		public string Uid
+		{
+			get { return GetContactField(ContactInfo.CNF_UNIQUEID); }
+		}
 
-        #region Equality stuff
+		#endregion
 
-        public override bool Equals(object obj)
-        {
-            if (obj is Contact)
-                return hContact == (obj as Contact).hContact;
-            else
-                return false;
-        }
+		#region Equality stuff
 
-        public bool Equals(Contact other)
-        {
-            if (ReferenceEquals(null, other)) return false;
-            if (ReferenceEquals(this, other)) return true;
-            return other.hContact.Equals(hContact);// &&
-                   //Equals(other.pluginLink, pluginLink);
-        }
+		public override bool Equals(object obj)
+		{
+			if (obj is Contact)
+				return hContact == (obj as Contact).hContact;
+			else
+				return false;
+		}
 
-        /// <summary>
-        /// Hash code is calculated uisng protocol name and user id because it
-        /// may be shared with another Miranda instance.
-        /// </summary>
-        public override int GetHashCode()
-        {
-            unchecked
-            {
-                return (Protocol.GetHashCode() * 397) ^ Uid.GetHashCode();
-            }
-        }
+		public bool Equals(Contact other)
+		{
+			if (ReferenceEquals(null, other)) return false;
+			if (ReferenceEquals(this, other)) return true;
+			return other.hContact.Equals(hContact); // &&
+			//Equals(other.pluginLink, pluginLink);
+		}
 
-        public static bool operator ==(Contact c1, Contact c2)
-        {
-            return c1.Equals(c2);
-        }
+		/// <summary>
+		/// Hash code is calculated uisng protocol name and user id because it
+		/// may be shared with another Miranda instance.
+		/// </summary>
+		public override int GetHashCode()
+		{
+			unchecked
+			{
+				return (Protocol.GetHashCode() * 397) ^ Uid.GetHashCode();
+			}
+		}
 
-        public static bool operator !=(Contact c1, Contact c2)
-        {
-            return !c1.Equals(c2);
-        }
+		public static bool operator ==(Contact c1, Contact c2)
+		{
+			return c1.Equals(c2);
+		}
 
-        #endregion
+		public static bool operator !=(Contact c1, Contact c2)
+		{
+			return !c1.Equals(c2);
+		}
 
-        /// <summary>
-        /// Object constructor.
-        /// </summary>
-        /// <param name="hContact">
-        /// Handle used for various Miranda contact manipulations.
-        /// </param>
-        public Contact(IntPtr hContact)
-        {
-            this.hContact = hContact;
+		#endregion
 
-            contactSettingChangedHook = ContactSettingChanged;
-            hContactSettingChangedHook = Plugin.m_HookEvent(
-                "DB/Contact/SettingChanged",
-                contactSettingChangedHook);
-        }
+		/// <summary>
+		/// Object constructor.
+		/// </summary>
+		/// <param name="hContact">
+		/// Handle used for various Miranda contact manipulations.
+		/// </param>
+		public Contact(IntPtr hContact)
+		{
+			this.hContact = hContact;
 
-        /// <summary>
-        /// Sends simple message to contact.
-        /// </summary>
-        /// <param name="message">
-        /// Message string to send.
-        /// </param>
-        public void SendMessage(string message)
-        {
-            var eventInfo = new DBEventInfo();
-            eventInfo.eventType = DBEventInfo.EVENTTYPE_MESSAGE;
-            eventInfo.flags = DBEventInfo.DBEF_SENT;
-            eventInfo.szModule = Protocol;
-            eventInfo.timestamp = (int)(DateTime.Now.ToUniversalTime() -
-                new DateTime(1970, 1, 1)).TotalSeconds;
-            
-            using (var pString =
-                new AutoPtr(Marshal.StringToHGlobalAnsi(message)))
-            using (var pDBEventInfo = new AutoPtr(
-                Marshal.AllocHGlobal(Marshal.SizeOf(typeof(DBEventInfo)))))
-            {
-                eventInfo.cbBlob = (uint)message.Length + 1;
-                eventInfo.pBlob = pString;
+			contactSettingChangedHook = ContactSettingChanged;
+			hContactSettingChangedHook = Plugin.m_HookEvent(
+				"DB/Contact/SettingChanged",
+				contactSettingChangedHook);
+		}
 
-                Marshal.StructureToPtr(eventInfo, pDBEventInfo, false);
+		/// <summary>
+		/// Sends simple message to contact.
+		/// </summary>
+		/// <param name="message">
+		/// Message string to send.
+		/// </param>
+		public void SendMessage(string message)
+		{
+			var eventInfo = new DBEventInfo();
+			eventInfo.eventType = DBEventInfo.EVENTTYPE_MESSAGE;
+			eventInfo.flags = DBEventInfo.DBEF_SENT;
+			eventInfo.szModule = Protocol;
+			eventInfo.timestamp = (int)(DateTime.Now.ToUniversalTime() -
+			                            new DateTime(1970, 1, 1)).TotalSeconds;
 
-                Plugin.m_CallService("DB/Event/Add", hContact, pDBEventInfo);
-                Plugin.m_CallContactService(hContact, "/SendMsg", IntPtr.Zero, pString);
-            }
-        }
+			using (var pString =
+				new AutoPtr(Marshal.StringToHGlobalAnsi(message)))
+			using (var pDBEventInfo = new AutoPtr(
+				Marshal.AllocHGlobal(Marshal.SizeOf(typeof (DBEventInfo)))))
+			{
+				eventInfo.cbBlob = (uint)message.Length + 1;
+				eventInfo.pBlob = pString;
 
-        /// <summary>
-        /// Method for enumeration of contact history items.
-        /// </summary>
-        /// <returns>
-        /// Enumerator for this contact history.
-        /// </returns>
-        public IEnumerable<HistoryItem> GetHistory()
-        {
-            var hEvent = Plugin.m_CallService("DB/Event/FindFirst", hContact,
-                                                IntPtr.Zero);
-            while (hEvent != IntPtr.Zero)
-            {
-                var item = HistoryItem.Load(this, hEvent);
-                yield return item;
-                hEvent = Plugin.m_CallService("DB/Event/FindNext", hEvent,
-                                                IntPtr.Zero);
-            }
-            yield break;
-        }
+				Marshal.StructureToPtr(eventInfo, pDBEventInfo, false);
 
-        /// <summary>
-        /// Gets contact info string from database.
-        /// </summary>
-        /// <param name="fieldFlag">
-        /// Flag from ContactInfo.CNF_* list.
-        /// </param>
-        /// <returns>
-        /// String from database interpreted as ANSI.
-        /// </returns>
-        private string GetContactField(byte fieldFlag)
-        {
-            // Create ContactInfo object:
-            var info = new ContactInfo();
-            info.hContact = hContact;
-            info.dwFlag = fieldFlag;
+				Plugin.m_CallService("DB/Event/Add", hContact, pDBEventInfo);
+				Plugin.m_CallContactService(hContact, "/SendMsg", IntPtr.Zero, pString);
+			}
+		}
 
-            string fieldData = null;
+		/// <summary>
+		/// Method for enumeration of contact history items.
+		/// </summary>
+		/// <returns>
+		/// Enumerator for this contact history.
+		/// </returns>
+		public IEnumerable<HistoryItem> GetHistory()
+		{
+			var hEvent = Plugin.m_CallService("DB/Event/FindFirst", hContact,
+				IntPtr.Zero);
+			while (hEvent != IntPtr.Zero)
+			{
+				var item = HistoryItem.Load(this, hEvent);
+				yield return item;
+				hEvent = Plugin.m_CallService("DB/Event/FindNext", hEvent,
+					IntPtr.Zero);
+			}
+			yield break;
+		}
 
-            using (var pContactInfo = new AutoPtr(
-                Marshal.AllocHGlobal(Marshal.SizeOf(typeof (ContactInfo)))))
-            {
-                // Copy ContactInfo to unmanaged memory:
-                Marshal.StructureToPtr(info, pContactInfo, false);
+		/// <summary>
+		/// Gets contact info string from database.
+		/// </summary>
+		/// <param name="fieldFlag">
+		/// Flag from ContactInfo.CNF_* list.
+		/// </param>
+		/// <returns>
+		/// String from database interpreted as ANSI.
+		/// </returns>
+		private string GetContactField(byte fieldFlag)
+		{
+			// Create ContactInfo object:
+			var info = new ContactInfo();
+			info.hContact = hContact;
+			info.dwFlag = fieldFlag;
 
-                var result = Plugin.m_CallService(
-                    "Miranda/Contact/GetContactInfo",
-                    IntPtr.Zero, pContactInfo);
+			string fieldData = null;
 
-                if (result == IntPtr.Zero)
-                {
-                    info = (ContactInfo) Marshal.PtrToStructure(pContactInfo,
-                                                                typeof (
-                                                                    ContactInfo));
-                    fieldData = Marshal.PtrToStringAnsi(info.value.pszVal);
-                }
-            }
+			using (var pContactInfo = new AutoPtr(
+				Marshal.AllocHGlobal(Marshal.SizeOf(typeof (ContactInfo)))))
+			{
+				// Copy ContactInfo to unmanaged memory:
+				Marshal.StructureToPtr(info, pContactInfo, false);
 
-            return fieldData;
-        }
+				var result = Plugin.m_CallService(
+					"Miranda/Contact/GetContactInfo",
+					IntPtr.Zero, pContactInfo);
 
-        /// <summary>
-        /// This method is called on contact status change.
-        /// </summary>
-        /// <param name="wParam">Handle of chagned contact.</param>
-        /// <param name="lParam">
-        /// Pointer to DBContactWriteSetting structure.
-        /// </param>
-        /// <returns>Always zero.</returns>
-        private int ContactSettingChanged(IntPtr wParam, IntPtr lParam)
-        {
-            IntPtr changedHContact = wParam;
-            if (changedHContact == hContact)
-            {
-                IntPtr pDBContactWriteSetting = lParam;
-                var setting = new DBContactWriteSetting();
-                Marshal.PtrToStructure(pDBContactWriteSetting, setting);
+				if (result == IntPtr.Zero)
+				{
+					info = (ContactInfo)Marshal.PtrToStructure(pContactInfo,
+						typeof (
+							ContactInfo));
+					fieldData = Marshal.PtrToStringAnsi(info.value.pszVal);
+				}
+			}
 
-                // TODO: Check this setting name
-                if (setting.szSetting == "Status" && 
-                    setting.szModule == Protocol)
-                {
-                    var newStatus = (Status) setting.value.Value.wVal;
-                    if (StatusChanged != null)
-                        StatusChanged(this, newStatus);
-                }
-            }
-            return 0;
-        }
+			return fieldData;
+		}
 
-        public void Dispose()
-        {
-            disposed = true;
-            Plugin.m_UnhookEvent(hContactSettingChangedHook);
-        }
+		/// <summary>
+		/// This method is called on contact status change.
+		/// </summary>
+		/// <param name="wParam">Handle of chagned contact.</param>
+		/// <param name="lParam">
+		/// Pointer to DBContactWriteSetting structure.
+		/// </param>
+		/// <returns>Always zero.</returns>
+		private int ContactSettingChanged(IntPtr wParam, IntPtr lParam)
+		{
+			IntPtr changedHContact = wParam;
+			if (changedHContact == hContact)
+			{
+				IntPtr pDBContactWriteSetting = lParam;
+				var setting = new DBContactWriteSetting();
+				Marshal.PtrToStructure(pDBContactWriteSetting, setting);
 
-        ~Contact()
-        {
-            if (!disposed)
-                Dispose();
-        }
-    }
+				// TODO: Check this setting name
+				if (setting.szSetting == "Status" &&
+				    setting.szModule == Protocol)
+				{
+					var newStatus = (Status)setting.value.Value.wVal;
+					if (StatusChanged != null)
+						StatusChanged(this, newStatus);
+				}
+			}
+			return 0;
+		}
+
+		public void Dispose()
+		{
+			disposed = true;
+			Plugin.m_UnhookEvent(hContactSettingChangedHook);
+		}
+
+		~Contact()
+		{
+			if (!disposed)
+				Dispose();
+		}
+	}
 }
