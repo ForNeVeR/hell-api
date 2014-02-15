@@ -13,7 +13,7 @@ mkdir $deployPath\Plugins
 mkdir $deployPath\Plugins\Hell
 
 # Hell Adapter
-$adapterPath = if ($X64) { 'Debug' } else { 'x64\Debug' }
+$adapterPath = if ($X64) { 'x64\Debug' } else { 'Debug' }
 Copy-Item $adapterPath\HellAdapter.dll $deployPath\Plugins
 Copy-Item $adapterPath\HellAdapter.pdb $deployPath\Plugins
 
