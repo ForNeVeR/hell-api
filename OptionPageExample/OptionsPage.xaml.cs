@@ -43,12 +43,18 @@ namespace Hell
         /// <param name="hInstance">
         /// Handle of DLL instance.
         /// </param>
-        public OptionsPage(IntPtr hInstance)
+        /// <param name="hLangpack">Miranda language pack header.</param>
+        public OptionsPage(IntPtr hInstance, int hLangpack)
         {
             InitializeComponent();
 
-            page = new OptionsPageInterface(hInstance, "Example",
-                "WPF Page", "Hell.OptionPlugin", this);
+	        page = new OptionsPageInterface(
+		        hInstance,
+		        hLangpack,
+				"Example",
+		        "WPF Page",
+				"Hell.OptionPlugin",
+				this);
         }
 
         /// <summary>

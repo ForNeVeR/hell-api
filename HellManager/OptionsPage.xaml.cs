@@ -49,27 +49,25 @@ namespace Hell
         /// <param name="hInstance">
         /// Handle of DLL instance.
         /// </param>
-        public OptionsPage(IntPtr hInstance, HellManager manager)
+        /// <param name="hLangpack">Miranda language pack header.</param>
+        /// <param name="manager">Manager plugin.</param>
+        public OptionsPage(IntPtr hInstance, int hLangpack, HellManager manager)
         {
             InitializeComponent();
 
             this.manager = manager;
 
-            pageInterface = new OptionsPageInterface(hInstance,
-                "Plugins", "Managed Plugins", "Hell.HellManager", this);
+            pageInterface = new OptionsPageInterface(
+				hInstance,
+				hLangpack,
+                "Plugins",
+				"Managed Plugins",
+				"Hell.HellManager", 
+				this);
 
-            pageInterface.PageShowed += (_) =>
-                {
-                    UpdateTable();
-                };
-            pageInterface.ResetPageQuery += (_) =>
-                {
-                    UpdateTable();
-                };
-            pageInterface.ApplyButtonPressed += (_) =>
-                {
-                    ApplyChanges();
-                };
+	        pageInterface.PageShowed += delegate { UpdateTable(); };
+	        pageInterface.ResetPageQuery += delegate { UpdateTable(); };
+	        pageInterface.ApplyButtonPressed += delegate { ApplyChanges(); };
         }
 
         /// <summary>

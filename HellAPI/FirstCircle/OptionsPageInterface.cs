@@ -82,6 +82,11 @@ namespace Hell.FirstCircle
         /// </summary>
         private IntPtr hInstance;
 
+		/// <summary>
+		/// Miranda language pack handle.
+		/// </summary>
+	    private readonly int _hLangpack;
+
         /// <summary>
         /// Name of group in Miranda options dialog.
         /// </summary>
@@ -95,7 +100,7 @@ namespace Hell.FirstCircle
         /// <summary>
         /// Unique string ID for HwndSource.
         /// </summary>
-        private string uniquePageID;
+        private string uniquePageId;
 
         /// <summary>
         /// Visual object representing the content to be placed into options
@@ -114,13 +119,14 @@ namespace Hell.FirstCircle
         /// <param name="hInstance">
         /// Handle of DLL instance. Used to gather resources from it.
         /// </param>
+        /// <param name="hLangpack">Miranda language pack handle.</param>
         /// <param name="groupName">
         /// Not localized name of group in Miranda options dialog.
         /// </param>
         /// <param name="pageName">
         /// Name of page in Miranda options dialog.
         /// </param>
-        /// <param name="uniquePageID">
+        /// <param name="uniquePageId">
         /// Unique string ID used for this page. Use of full qualified plugin
         /// class name recommended.
         /// </param>
@@ -128,13 +134,19 @@ namespace Hell.FirstCircle
         /// Visual object representing the content to be placed into options
         /// page.
         /// </param>
-        public OptionsPageInterface(IntPtr hInstance, string groupName,
-            string pageName, string uniquePageID, Visual content)
+        public OptionsPageInterface(
+			IntPtr hInstance,
+			int hLangpack,
+			string groupName,
+	        string pageName,
+			string uniquePageId,
+			Visual content)
         {
             this.hInstance = hInstance;
+	        _hLangpack = hLangpack;
             this.groupName = groupName;
             this.pageName = pageName;
-            this.uniquePageID = uniquePageID;
+            this.uniquePageId = uniquePageId;
             this.content = content;
             
             // Prepare delegates:
@@ -166,15 +178,18 @@ namespace Hell.FirstCircle
             using (var pOptionPage = new AutoPtr(Marshal.AllocHGlobal(
                 Marshal.SizeOf(typeof(OptionsDialogPage)))))
             {
-                var optionPage = new OptionsDialogPage();
-                optionPage.position = -800000000;
-                optionPage.hInstance = hInstance;
-                optionPage.pszTemplate = new IntPtr(Utils.StubDialogID);
-                optionPage.pszGroup = groupName;
-                optionPage.pszTitle = pageName;
-                optionPage.pfnDlgProc = dlgProc;
+                var optionPage = new OptionsDialogPage
+                {
+	                position = -800000000,
+	                hInstance = hInstance,
+	                pszTemplate = new IntPtr(Utils.StubDialogID),
+	                pszGroup = groupName,
+	                pszTitle = pageName,
+	                pfnDlgProc = dlgProc,
+					hLangpack = _hLangpack
+                };
 
-                Marshal.StructureToPtr(optionPage, pOptionPage, false);
+	            Marshal.StructureToPtr(optionPage, pOptionPage, false);
                 Plugin.m_CallService("Opt/AddPage", addInfo, pOptionPage);
             }
 
@@ -206,7 +221,7 @@ namespace Hell.FirstCircle
             {
                 this.hDlg = hDlg;
                 
-                var parameters = new HwndSourceParameters(uniquePageID);
+                var parameters = new HwndSourceParameters(uniquePageId);
                 parameters.PositionX = 0;
                 parameters.PositionY = 0;
                 parameters.Width = Utils.MirandaOptionsWidth;

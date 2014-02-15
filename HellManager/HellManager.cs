@@ -92,7 +92,7 @@ namespace Hell
                 }
             }
 
-            options = new OptionsPage(HInstance, this);
+            options = new OptionsPage(HInstance, HLangpack, this);
         }
 
         /// <summary>
@@ -122,7 +122,7 @@ namespace Hell
         {
             var plugin = pluginType.GetConstructor(new Type[0]).Invoke(
                 new object[0]) as Plugin;
-            plugin.Load(HInstance);
+            plugin.Load(HInstance, HLangpack);
 
             loadedPlugins.Add(plugin);
             if (UnloadedTypes.Contains(pluginType))

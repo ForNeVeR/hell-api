@@ -37,18 +37,22 @@ namespace Hell
         /// </summary>
         protected IntPtr HInstance { get; private set; }
 
+		/// <summary>
+		/// Miranda language pack handle.
+		/// </summary>
+		protected int HLangpack { get; private set; }
+
         /// <summary>
         /// This method will be called first on plugin creation.
         /// </summary>
         /// <param name="hInstance">
         /// Handle of DLL instance.
         /// </param>
-        /// <param name="pluginLink">
-        /// Reference to object containing various Miranda service functions.
-        /// </param>
-        public void Load(IntPtr hInstance)
+		/// <param name="hLangpack">Miranda language pack handle.</param>
+        public void Load(IntPtr hInstance, int hLangpack)
         {
             HInstance = hInstance;
+	        HLangpack = hLangpack;
             Load();
         }
 

@@ -45,7 +45,7 @@ namespace Hell
         /// </summary>
         protected override void Load()
         {
-            options = new OptionsPage(HInstance);
+            options = new OptionsPage(HInstance, HLangpack);
         }
 
         /// <summary>

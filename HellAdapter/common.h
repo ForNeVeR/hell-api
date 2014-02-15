@@ -27,6 +27,7 @@
 #include <Windows.h>
 
 #include <newpluginapi.h>
+#include <m_langpack.h>
 
 #include "version.h"
 

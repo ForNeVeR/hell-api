@@ -133,9 +133,12 @@ MIRANDA_EXPORT PLUGININFOEX *MirandaPluginInfoEx(DWORD mirandaVersion)
 /* A function called on plugin load. */
 MIRANDA_EXPORT int Load()
 {
+	mir_getLP(&pluginInfo);
+
     // Load manager plugin:
-    array<Object ^> ^args = gcnew array<Object ^>(1);
+    array<Object ^> ^args = gcnew array<Object ^>(2);
     args[0] = gcnew IntPtr(hInstance);
+	args[1] = gcnew Int32(hLangpack);
 
     PluginCollection::ManagerPlugin->GetType()->InvokeMember("Load",
         BindingFlags::InvokeMethod, nullptr, PluginCollection::ManagerPlugin,
