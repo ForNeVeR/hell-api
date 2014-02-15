@@ -18,7 +18,7 @@ Copy-Item $adapterPath\HellAdapter.dll $deployPath\Plugins
 Copy-Item $adapterPath\HellAdapter.pdb $deployPath\Plugins
 
 # Hell API
-$bin = if ($X64) { 'x86' } else { 'x64' }
+$bin = if ($X64) { 'x64' } else { 'x86' }
 Copy-Item HellAPI\bin\$bin\Debug\* $deployPath
 
 # Hell Manager
