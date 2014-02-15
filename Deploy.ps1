@@ -1,3 +1,7 @@
+param(
+	[switch] $X64
+)
+
 $deployPath = 'Deploy'
 
 if (Test-Path $deployPath) {
@@ -9,11 +13,13 @@ mkdir $deployPath\Plugins
 mkdir $deployPath\Plugins\Hell
 
 # Hell Adapter
-Copy-Item Debug\HellAdapter.dll $deployPath\Plugins
-Copy-Item Debug\HellAdapter.pdb $deployPath\Plugins
+$adapterPath = if ($X64) { 'Debug' } else { 'x64\Debug' }
+Copy-Item $adapterPath\HellAdapter.dll $deployPath\Plugins
+Copy-Item $adapterPath\HellAdapter.pdb $deployPath\Plugins
 
 # Hell API
-Copy-Item HellAPI\bin\x86\Debug\* $deployPath
+$bin = if ($X64) { 'x86' } else { 'x64' }
+Copy-Item HellAPI\bin\$bin\Debug\* $deployPath
 
 # Hell Manager
-Copy-Item HellManager\bin\x86\Debug\* $deployPath\Plugins\Hell
+Copy-Item HellManager\bin\$bin\Debug\* $deployPath\Plugins\Hell
